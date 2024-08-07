@@ -37,7 +37,7 @@ ___
 è necessario eseguire il file `main.py`.
 
 #### Struttura della Repository
-- [/data](https://github.com/ax-ten/ICON-23-24-EDH/tree/main/data):  mazzi scaricati da Archidekt e l'Ontologia.
+- [/data](https://github.com/ax-ten/ICON-23-24-EDH/tree/main/data):  mazzi da Archidekt, Ontologia.
 - [/src](https://github.com/ax-ten/ICON-23-24-EDH/tree/main/src): codice sorgente Python.
 
 ## Conclusioni
