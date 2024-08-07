@@ -3,9 +3,9 @@ Progetto di Ingegneria della Conoscenza dell'anno accademico 2023-2024 all'Unive
 ## Presentazione
 Da qualche anno il bacino di utenti del gioco di carte di Magic: the Gathering è cresciuto a dismisura, così come l'attenzione dei giocatori veterani al formato di gioco 'Commander'. L'obiettivo principale di questo progetto è semplificare il processo di creazione di mazzi (Deckmaking) per gli utenti meno esperti.
 ###### Sviluppato da:
-- **Damato Luigi Lele**\
+<img data-component="Avatar" alt="ax-ten" size="20" src="https://avatars.githubusercontent.com/u/38043310?v=4&amp;size=40" data-testid="github-avatar" aria-label="ax-ten" height="20" width="20" class="Avatar__StyledAvatar-sc-2lv0r8-0 gMUnCp"> **Damato Luigi Lele**\
   Matricola: 743476\
-  l.damato15@uniba.it <img style="height:auto;" alt="" src="https://avatars.githubusercontent.com/u/38043310?v=4" width="260" height="260" class="avatar avatar-user width-full border color-bg-default">
+  l.damato15@uniba.it 
 
 ## Come funziona 
 Consultare la [Documentazione](https://github.com/ax-ten/ICON-23-24-EDH/blob/main/doc/Documentazione.pdf)
