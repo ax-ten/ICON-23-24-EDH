@@ -1,0 +1,1273 @@
+AbilityKeyword:
+  description: A passive ability represented by word that substitutes for a piece
+    of rules text, such as deathtouch or flying.
+  permissible_values:
+    Absorb:
+      description: If a source would deal damage to this creature, prevent N of that
+        damage.
+      meaning: mtg:absorb
+      types:
+      - Static
+      written_as: Absorb N
+    Affinity:
+      description: This spell costs  less to cast for each [text] you control.
+      meaning: mtg:affinity
+      types:
+      - Static
+      written_as: Affinity for [text]
+    Afflict:
+      description: Whenever this creature becomes blocked, defending player loses
+        N life.
+      meaning: mtg:afflict
+      types:
+      - Triggered
+      written_as: Afflict N
+    Afterlife:
+      description: When this creature dies, create N 1/1 white and black Spirit creature
+        token(s with flying.
+      meaning: mtg:afterlife
+      types:
+      - Triggered
+      written_as: Afterlife N
+    Aftermath:
+      description: Cast this spell only from your graveyard. Then exile it.
+      meaning: mtg:aftermath
+      types:
+      - Static
+      written_as: 'Aftermath '
+    Amplify:
+      description: As this creature enters the battlefield, put N +1/+1 counters on
+        it for each [creature type] card you reveal in your hand.
+      meaning: mtg:amplify
+      types:
+      - Static
+      written_as: Amplify N
+    Annihilator:
+      description: Whenever this creature attacks, defending player sacrifices N permanents.
+      meaning: mtg:annihilator
+      types:
+      - Triggered
+      written_as: Annihilator N
+    Ascend:
+      description: "If you control ten or more permanents, you get the city\u2019\
+        s blessing for the rest of the game."
+      meaning: mtg:ascend
+      types:
+      - Spell
+      - Static
+      written_as: 'Ascend '
+    Assist:
+      description: Another player can pay up to  of this spell's cost.
+      meaning: mtg:assist
+      types:
+      - Static
+      written_as: 'Assist '
+    Aura_swap:
+      description: '[Cost]: Exchange this Aura with an Aura card in your hand.'
+      meaning: mtg:aura_swap
+      types:
+      - Activated
+      written_as: 'Aura swap[cost] '
+    Awaken:
+      description: If you cast this card for [cost], also put N +1/+1 counters on
+        target land you control and it becomes a 0/0 Elemental creature with haste.
+        It's still a land.
+      meaning: mtg:awaken
+      types:
+      - Static
+      - Spell
+      written_as: "Awaken N \u2014 [cost] "
+    Backup:
+      description: "When this creature enters the battlefield, put N +1/+1 counters\
+        \ on target creature. If that\\\u2019s another creature, it also gains the\
+        \ non-backup abilities of this creature printed below this one until end of\
+        \ turn.\u201D Cards with backup have one or more abilities printed after the\
+        \ backup ability. (Some cards with backup also have abilities printed before\
+        \ the backup ability)."
+      types:
+      - Triggered
+      written_as: Backup N
+    Banding:
+      alt_description: (Any [quality] creatures can attack in a band as long as at
+        least one has "bands with other [quality]." Bands are blocked as a group.
+        If at least two [quality] creatures you control, one of which has "bands with
+        other [quality]," are blocking or being blocked by the same creature, you
+        divide that creature's combat damage, not its controller, among any of the
+        creatures it's being blocked by or is blocking.
+      alt_written_as: Bands with other [quality]
+      description: Any creatures with banding, and up to one without, can attack in
+        a band. Bands are blocked as a group. If any creatures with banding you control
+        are blocking or being blocked by a creature, you divide that creature's combat
+        damage, not its controller, among any of the creatures it's being blocked
+        by or is blocking
+      types:
+      - Static
+      written_as: Banding [cost]
+    Bargain:
+      description: You may sacrifice an artifact, enchantment, or token as you cast
+        this spell.
+      meaning: mtg:bargain
+      types:
+      - Static
+      written_as: 'Bargain '
+    Battle_cry:
+      description: Whenever this creature attacks, each other attacking creature gets
+        +1/+0 until end of turn.
+      meaning: mtg:battle_cry
+      types:
+      - Triggered
+      written_as: 'Battle cry '
+    Bestow:
+      description: If you cast this card for its bestow cost, it's an Aura spell with
+        enchant creature. It becomes a creature again if it's not attached to a creature.
+      meaning: mtg:bestow
+      types:
+      - Static
+      - Static
+      written_as: 'Bestow[cost] '
+    Blitz:
+      description: If you cast this spell for its blitz cost, it gains haste and "When
+        this creature dies, draw a card". Sacrifice it at the beginning of the next
+        end step.
+      meaning: mtg:blitz
+      types:
+      - Static
+      - Static
+      - Static
+      written_as: 'Blitz[cost] '
+    Bloodthirst:
+      description: If an opponent was dealt damage this turn, this permanent enters
+        the battlefield with N +1/+1 counters on it.
+      meaning: mtg:bloodthirst
+      types:
+      - Static
+      written_as: Bloodthirst N
+    Boast:
+      description: Activate this ability only if this creature attacked this turn
+        and only once each turn.
+      meaning: mtg:boast
+      types:
+      - Activated
+      written_as: "Boast \u2014 [Cost]: [Effect]"
+    Bushido:
+      description: Whenever this creature blocks or becomes blocked, it gets +N/+N
+        until end of turn.
+      meaning: mtg:bushido
+      types:
+      - Triggered
+      written_as: Bushido N
+    Buyback:
+      description: "You may pay an additional [cost] as you cast this spell. If the\
+        \ buyback cost was paid, put this spell into its owner\u2019s hand instead\
+        \ of into that player\u2019s graveyard as it resolves."
+      meaning: mtg:buyback
+      types:
+      - Static
+      - Static
+      written_as: 'Buyback[cost] '
+    Cascade:
+      description: When you cast this spell, exile cards from the top of your library
+        until you exile a nonland card whose mana value is less than this spell's
+        mana value. You may cast that card without paying its mana cost if the resulting
+        spell's mana value is less than this spell's mana value. Then put all cards
+        exiled this way that weren't cast on the bottom of your library in a random
+        order.
+      meaning: mtg:cascade
+      types:
+      - Triggered
+      written_as: 'Cascade '
+    Casualty:
+      alt_description: As you cast this spell, you may sacrifice a creature with power
+        X. When you do, copy this spell.
+      alt_written_as: 'Casualty X  '
+      description: 'As you cast this spell, you may sacrifice a creature with power
+        N or greater. When you do, copy this spell.   '
+      meaning: mtg:casualty
+      types:
+      - Static
+      - Triggered
+      written_as: Casualty N
+    Champion:
+      description: When this enters the battlefield, sacrifice it unless you exile
+        another creature you control. When this leaves the battlefield, that card
+        returns to the battlefield.
+      meaning: mtg:champion
+      types:
+      - Triggered
+      - Triggered
+      written_as: Champion an [object]
+    Changeling:
+      description: This card is every creature type.
+      meaning: mtg:changeling
+      types:
+      - Characteristic-defining
+      written_as: 'Changeling '
+    Cipher:
+      description: Then you may exile this spell card encoded on a creature you control.
+        Whenever that creature deals combat damage to a player, its controller may
+        cast a copy of this card without paying its mana cost.
+      meaning: mtg:cipher
+      types:
+      - Spell
+      - Static
+      written_as: 'Cipher '
+    Cleave:
+      description: You may cast this spell for its cleave cost. If you do, remove
+        the words in square brackets.
+      meaning: mtg:cleave
+      types:
+      - Static
+      - Static
+      written_as: 'Cleave '
+    Companion:
+      description: If this card is your chosen companion, you may put it into your
+        hand from outside the game for  any time you could cast a sorcery.
+      meaning: mtg:companion
+      types:
+      - Static
+      written_as: "Companion \u2014 [deck-building restriction]"
+    Compleated:
+      description: '[Phyrexian hybrid mana] can be paid with M, N, or 2 life. For
+        each [Phyrexian hybrid mana] paid with life, this planeswalker enters with
+        two fewer loyalty counters.'
+      meaning: mtg:compleated
+      types:
+      - Static
+      written_as: 'Compleated '
+    Conspire:
+      description: As you cast this spell, you may tap two untapped creatures you
+        control that share a color with it. When you do, copy it and you may choose
+        a new target for the copy.
+      meaning: mtg:conspire
+      types:
+      - Static
+      - Triggered
+      written_as: 'Conspire '
+    Convoke:
+      description: Your creatures can help cast this spell. Each creature you tap
+        while casting this spell pays for  or one mana of that creature's color.
+      meaning: mtg:convoke
+      types:
+      - Static
+      written_as: 'Convoke '
+    Craft:
+      description: "[Cost], Exile this permanent, Exile [materials] from among permanents\
+        \ you control and/or cards in your graveyard: Return this card to the battlefield\
+        \ transformed under its owner\u2019s control. Activate only as a sorcery"
+      types:
+      - Activated
+      written_as: Craft with [materials] [cost]
+    Crew:
+      description: 'Tap any number of other untapped creatures you control with total
+        power N or greater: This permanent becomes an artifact creature until end
+        of turn.'
+      meaning: mtg:crew
+      types:
+      - Activated
+      written_as: Crew N
+    Cumulative_upkeep:
+      description: "At the beginning of your upkeep, if this permanent is on the battlefield,\
+        \ put an age counter on this permanent. Then you may pay [cost] for each age\
+        \ counter on it. If you don\u2019t, sacrifice it."
+      meaning: mtg:cumulative_upkeep
+      types:
+      - Triggered
+      written_as: 'Cumulative upkeep[cost] '
+    Cycling:
+      description: '[Cost], Discard this card: Draw a card.   [type]cycling  [cost]
+        ([Cost], Discard this card: Search your library for a [type] card, reveal
+        it, and put it into your hand. Then shuffle your library.'
+      meaning: mtg:cycling
+      types:
+      - Activated
+      written_as: 'Cycling[cost] '
+    Dash:
+      description: You may cast this spell for its dash cost. If you do, it gains
+        haste, and it's returned from the battlefield to its owner's hand at the beginning
+        of the next end step.
+      meaning: mtg:dash
+      types:
+      - Static
+      - Static
+      - Static
+      written_as: 'Dash[cost] '
+    Daybound_and_nightbound:
+      description: If a player cast no spells during their own turn, it becomes night
+        next turn.   Nightbound   (If a player cast at least two spells during their
+        own turn, it becomes day next turn.
+      meaning: mtg:daybound_and_nightbound
+      types:
+      - Static
+      written_as: 'Daybound '
+    Deathtouch:
+      description: Any amount of damage a source with deathtouch deals to a creature is enough to destroy
+        it.
+      meaning: mtg:deathtouch
+      types:
+      - Static
+      written_as: 'Deathtouch '
+    Decayed:
+      description: This creature can't block. When it attacks, sacrifice it at the
+        end of combat.
+      meaning: mtg:decayed
+      types:
+      - Static
+      written_as: 'Decayed '
+    Defender:
+      description: This creature can't attack.
+      meaning: mtg:defender
+      types:
+      - Static
+      written_as: 'Defender '
+    Delve:
+      description: Each card you exile from your graveyard while casting this spell
+        pays for .
+      meaning: mtg:delve
+      types:
+      - Static
+      written_as: 'Delve '
+    Demonstrate:
+      description: When you cast this spell, you may copy it. If you do, choose an
+        opponent to also copy it. Players may choose new targets for their copies.
+      meaning: mtg:demonstrate
+      types:
+      - Triggered
+      written_as: 'Demonstrate '
+    Dethrone:
+      description: Whenever this creature attacks the player with the most life or
+        tied for most life, put a +1/+1 counter on it.
+      meaning: mtg:dethrone
+      types:
+      - Triggered
+      written_as: 'Dethrone '
+    Devoid:
+      description: This card has no color.
+      meaning: mtg:devoid
+      types:
+      - Characteristic-defining
+      written_as: 'Devoid '
+    Devour:
+      alt_description: As this enters the battlefield, you may sacrifice any number
+        of [type] permanents. This creature enters the battlefield with N times that
+        many +1/+1 counters on it.
+      alt_written_as: 'Devour [type] N  '
+      description: 'As this enters the battlefield, you may sacrifice any number of
+        creatures. This creature enters the battlefield with N times that many +1/+1
+        counters on it.   '
+      meaning: mtg:devour
+      types:
+      - Static
+      written_as: Devour N
+    Disguise:
+      description: You may cast this card as a 2/2 face-down creature with ward {2},
+        no name, no subtypes, and no mana cost by paying {3} rather than paying its
+        mana cost
+      types:
+      - Static
+      written_as: Disguise [cost]
+    Disturb:
+      description: You may cast this card from your graveyard transformed for its
+        disturb cost.
+      meaning: mtg:disturb
+      types:
+      - Static
+      written_as: 'Disturb '
+    Double_strike:
+      description: This creature deals both first-strike and regular combat damage.
+      meaning: mtg:double_strike
+      types:
+      - Static
+      written_as: 'Double strike '
+    Dredge:
+      description: If you would draw a card, instead you may mill N cards. If you
+        do, return this card from your graveyard to your hand.
+      meaning: mtg:dredge
+      types:
+      - Static
+      written_as: Dredge N
+    Echo:
+      description: At the beginning of your upkeep, if this came under your control
+        since the beginning of your last upkeep, sacrifice it unless you pay its echo
+        cost.
+      meaning: mtg:echo
+      types:
+      - Triggered
+      written_as: 'Echo[cost] '
+    Embalm:
+      description: '[Cost], Exile this card from your graveyard: Create a token that''s
+        a copy of it, except it''s a white Zombie ... with no mana cost. Embalm only
+        as a sorcery.'
+      meaning: mtg:embalm
+      types:
+      - Activated
+      written_as: 'Embalm[cost] '
+    Emerge:
+      description: You may cast this spell by sacrificing a creature and paying the
+        emerge cost reduced by that creature's mana value.
+      meaning: mtg:emerge
+      types:
+      - Static
+      written_as: 'Emerge[cost] '
+    Enchant:
+      description: This card can only be attached to an [object or player].
+      meaning: mtg:enchant
+      types:
+      - Static
+      written_as: Enchant [object or player]
+    Encore:
+      description: '[Cost], Exile this card from your graveyard: For each opponent,
+        create a token copy that attacks that opponent this turn if able. They gain
+        haste. Sacrifice them at the beginning of the next end step. Activate only
+        as a sorcery.'
+      meaning: mtg:encore
+      types:
+      - Activated
+      written_as: 'Encore[cost] '
+    Enlist:
+      description: As this creature attacks, you may tap a nonattacking creature you
+        control without summoning sickness. When you do, add its power to this creature's
+        until end of turn.
+      meaning: mtg:enlist
+      types:
+      - Static
+      written_as: 'Enlist '
+    Entwine:
+      description: Choose all if you pay the entwine cost.
+      meaning: mtg:entwine
+      types:
+      - Static
+      written_as: 'Entwine[cost] '
+    Epic:
+      description: For the rest of the game, you can't cast spells. At the beginning
+        of each of your upkeeps, copy this spell except for its epic ability. You
+        may choose new targets for the copy.
+      meaning: mtg:epic
+      types:
+      - Spell
+      - Spell
+      written_as: 'Epic '
+    Equip:
+      alt_description: '[Cost]: Attach this permanent to target planeswalker you control
+        as though that planeswalker were a creature. Activate only as a sorcery.'
+      alt_written_as: 'Equip planeswalker  [cost] '
+      description: '[Cost]: Attach this permanent to target [quality] creature you
+        control. Activate this ability only any time you could cast a sorcery.   '
+      meaning: mtg:equip
+      types:
+      - Activated
+      written_as: 'Equip [quality][cost] '
+    Escalate:
+      description: Pay this cost for each mode chosen beyond the first.
+      meaning: mtg:escalate
+      types:
+      - Static
+      written_as: 'Escalate[cost] '
+    Escape:
+      description: You may cast this card from your graveyard for its escape cost
+      meaning: mtg:escape
+      types:
+      - Static
+      written_as: 'Escape '
+    Eternalize:
+      description: '[Cost], Exile this card from your graveyard: Create a token that''s
+        a copy of it, except it''s a 4/4 black Zombie ... with no mana cost. Eternalize
+        only as a sorcery.'
+      meaning: mtg:eternalize
+      types:
+      - Activated
+      written_as: 'Eternalize[cost] '
+    Evoke:
+      description: You may cast this spell for its evoke cost. If you do, it's sacrificed
+        when it enters the battlefield.
+      meaning: mtg:evoke
+      types:
+      - Static
+      - Triggered
+      written_as: 'Evoke[cost] '
+    Evolve:
+      description: Whenever a creature enters the battlefield under your control,
+        if that creature has greater power or toughness than this creature, put a
+        +1/+1 counter on this creature.
+      meaning: mtg:evolve
+      types:
+      - Triggered
+      written_as: 'Evolve '
+    Exalted:
+      description: Whenever a creature you control attacks alone, it gets +1/+1 until
+        end of turn for each instance of exalted among permanents you control.
+      meaning: mtg:exalted
+      types:
+      - Triggered
+      written_as: 'Exalted '
+    Exploit:
+      description: When this creature enters the battlefield, you may sacrifice a
+        creature.
+      meaning: mtg:exploit
+      types:
+      - Triggered
+      written_as: 'Exploit '
+    Extort:
+      description: Whenever you cast a spell, you may pay  If you do, each opponent
+        loses 1 life and you gain that much life.
+      meaning: mtg:extort
+      types:
+      - Triggered
+      written_as: 'Extort '
+    Fabricate:
+      description: When this permanent enters the battlefield, you may put N +1/+1
+        counters on it. If you don't, create N 1/1 colorless Servo artifact creature
+        tokens.
+      meaning: mtg:fabricate
+      types:
+      - Triggered
+      written_as: Fabricate N
+    Fading:
+      description: This creature enters the battlefield with N fade counters on it.
+        At the beginning of your upkeep, remove a fade counter from it. If you can't,
+        sacrifice it.
+      meaning: mtg:fading
+      types:
+      - Static
+      - Triggered
+      written_as: Fading N
+    Fear:
+      description: This creature can't be blocked except by artifact creatures and/or
+        black creatures.
+      meaning: mtg:fear
+      types:
+      - Evasion
+      written_as: 'Fear '
+    First_strike:
+      description: This creature deals combat damage before creatures without first
+        strike.
+      meaning: mtg:first_strike
+      types:
+      - Static
+      written_as: 'First strike '
+    Flanking:
+      description: Whenever a creature without flanking blocks this creature, the
+        blocking creature gets -1/-1 until end of turn.
+      meaning: mtg:flanking
+      types:
+      - Triggered
+      written_as: 'Flanking '
+    Flash:
+      description: You may cast this spell any time you could cast an instant.
+      meaning: mtg:flash
+      types:
+      - Static
+      written_as: 'Flash '
+    Flashback:
+      description: You may cast this card from your graveyard for its flashback cost.
+        Then exile it.
+      meaning: mtg:flashback
+      types:
+      - Static
+      - Static
+      written_as: 'Flashback[cost] '
+    Flying:
+      description: This creature can't be blocked except by creatures with flying
+        and/or reach.
+      meaning: mtg:flying
+      types:
+      - Evasion
+      written_as: 'Flying '
+    Forecast:
+      description: Activate this ability only during your upkeep and only once each
+        turn.
+      meaning: mtg:forecast
+      types:
+      - Activated
+      written_as: 'Forecast[cost] '
+    Foretell:
+      description: During your turn, you may pay  and exile this card from your hand
+        face down. Cast it on a later turn for its foretell cost.
+      meaning: mtg:foretell
+      types:
+      - Static
+      - Static
+      written_as: 'Foretell[cost] '
+    Fortify:
+      description: '[Cost]: Attach this Fortification to target land you control.
+        Activate only as a sorcery.'
+      meaning: mtg:fortify
+      types:
+      - Activated
+      written_as: 'Fortify[cost] '
+    Frenzy:
+      description: Whenever this creature attacks and isn't blocked, it gets +N/+0
+        until end of turn.
+      meaning: mtg:frenzy
+      types:
+      - Triggered
+      written_as: Frenzy N
+    Fuse:
+      description: You may cast one or both halves of this card from your hand.
+      meaning: mtg:fuse
+      types:
+      - Static
+      written_as: 'Fuse '
+    Graft:
+      description: This creature enters the battlefield with N +1/+1 counters on it.
+        Whenever another creature enters the battlefield, you may move a +1/+1 counter
+        from this creature onto it.
+      meaning: mtg:graft
+      types:
+      - Static
+      - Triggered
+      written_as: Graft N
+    Gravestorm:
+      description: When you cast this spell, copy it for each permanent put into a
+        graveyard this turn. You may choose new targets for the copies.
+      meaning: mtg:gravestorm
+      types:
+      - Triggered
+      written_as: 'Gravestorm '
+    Haste:
+      description: This creature can attack and  as soon as it comes under your control.
+      meaning: mtg:haste
+      types:
+      - Static
+      written_as: 'Haste '
+    Haunt:
+      description: When this creature dies, exile it haunting target creature.
+      meaning: mtg:haunt
+      types:
+      - Triggered
+      written_as: 'Haunt '
+    Hexproof:
+      alt_description: This permanent can't be the target of [quality] spells your
+        opponents control or abilities of [quality] sources your opponents control.
+      alt_written_as: 'Hexproof from [quality]   '
+      description: 'This permanent can''t be the target of spells or abilities your
+        opponents control.   '
+      meaning: mtg:hexproof
+      types:
+      - Static
+      written_as: 'Hexproof '
+    Hidden_agenda:
+      description: Start the game with this conspiracy face down in the command zone
+        and secretly name a card. You may turn this conspiracy face up any time and
+        reveal the chosen name.   Double agenda   (Start the game with this conspiracy
+        face down in the command zone and secretly name two different cards. You may
+        turn this conspiracy face up any time and reveal the chosen names.
+      meaning: mtg:hidden_agenda
+      types:
+      - Static
+      written_as: 'Hidden agenda '
+    Hideaway:
+      description: When this permanent enters the battlefield, look at the top N cards
+        of your library, exile one face down, then put the rest on the bottom of your
+        library.
+      meaning: mtg:hideaway
+      types:
+      - Triggered
+      written_as: Hideaway N
+    Horsemanship:
+      description: This creature can't be blocked except by creatures with horsemanship.
+      meaning: mtg:horsemanship
+      types:
+      - Evasion
+      written_as: 'Horsemanship '
+    Improvise:
+      description: Your artifacts can help cast this spell. Each artifact you tap
+        after you're done activating mana abilities pays for .
+      meaning: mtg:improvise
+      types:
+      - Static
+      written_as: 'Improvise '
+    Indestructible:
+      description: "Damage and effects that say \"destroy\" don\u2019t destroy this."
+      meaning: mtg:indestructible
+      types:
+      - Static
+      written_as: 'Indestructible '
+    Infect:
+      description: This creature deals damage to creatures in the form of -1/-1 counters
+        and to players in the form of poison counters.
+      meaning: mtg:infect
+      types:
+      - Static
+      written_as: 'Infect '
+    Ingest:
+      description: Whenever this creature deals combat damage to a player, that player
+        exiles the top card of their library
+      meaning: mtg:ingest
+      types:
+      - "Triggered\u200E"
+      written_as: 'Ingest '
+    Intimidate:
+      description: This creature can't be blocked except by artifact creatures and/or
+        creatures that share a color with it.
+      meaning: mtg:intimidate
+      types:
+      - Evasion
+      written_as: 'Intimidate '
+    Kicker:
+      description: You may pay an additional [cost] as you cast this spell.   Multikicker  [cost]
+        (You may pay an additional [cost] any number of times as you cast this spell.
+      meaning: mtg:kicker
+      types:
+      - Static
+      written_as: 'Kicker[cost] '
+    Landwalk:
+      description: This creature can't be blocked as long as defending player controls
+        a [type].
+      meaning: mtg:landwalk
+      types:
+      - Evasion
+      written_as: '[Type] Landwalk '
+    Level_up:
+      description: '[Cost]: Put a level counter on this. Level up only as a sorcery.'
+      meaning: mtg:level_up
+      types:
+      - Activated
+      written_as: 'Level up[cost] '
+    Lifelink:
+      description: Damage dealt by this creature also causes you to gain that much
+        life.
+      meaning: mtg:lifelink
+      types:
+      - Static
+      written_as: 'Lifelink '
+    Living_metal:
+      description: "As long as it\u2019s your turn, this Vehicle is also a creature."
+      meaning: mtg:living_metal
+      types:
+      - Static
+      written_as: 'Living metal '
+    Living_weapon:
+      description: When this Equipment enters the battlefield, create a 0/0 black
+        Phyrexian Germ creature token, then attach this Equipment to it.
+      meaning: mtg:living_weapon
+      types:
+      - Triggered
+      written_as: 'Living weapon '
+    Madness:
+      description: If you discard this card, discard it into exile. When you do, cast
+        it for its madness cost or put it into your graveyard.
+      meaning: mtg:madness
+      types:
+      - Static
+      - Triggered
+      written_as: 'Madness[cost] '
+    Melee:
+      description: Whenever this creature attacks, it gets +1/+1 until end of turn
+        for each opponent you attacked with a creature this combat.
+      meaning: mtg:melee
+      types:
+      - Triggered
+      written_as: 'Melee '
+    Menace:
+      description: This creature can't be blocked except by two or more creatures.
+      meaning: mtg:menace
+      types:
+      - Evasion
+      written_as: 'Menace '
+    Mentor:
+      description: Whenever this creature attacks, put a +1/+1 counter on target attacking
+        creature with lesser power.
+      meaning: mtg:mentor
+      types:
+      - Triggered
+      written_as: 'Mentor '
+    Miracle:
+      description: "You may reveal this card from your hand as you draw it if it\u2019\
+        s the first card you\u2019ve drawn this turn. When you reveal this card this\
+        \ way, you may cast it by paying [cost] rather than its mana cost"
+      types:
+      - Static
+      - Triggered
+      written_as: Miracle
+    Modular:
+      description: This enters the battlefield with N +1/+1 counters on it. When it
+        dies, you may put its +1/+1 counters on target artifact creature.
+      meaning: mtg:modular
+      types:
+      - Static
+      - Triggered
+      written_as: Modular N
+    Morph:
+      description: You may cast this face down as a 2/2 creature for . Turn it face
+        up any time for its morph cost.   Megamorph  [cost] (You may cast this card
+        face down as a 2/2 creature for . Turn it face up at any time for its megamorph
+        cost and put a +1/+1 counter on it.
+      meaning: mtg:morph
+      types:
+      - Static
+      written_as: 'Morph[cost] '
+    Mutate:
+      description: If you cast this spell for its mutate cost, put it over or under
+        target non-Human creature you own. They mutate into the creature on top plus
+        all abilities from under it.
+      meaning: mtg:mutate
+      types:
+      - Static
+      written_as: 'Mutate[cost] '
+    Myriad:
+      description: Whenever this creature attacks, for each opponent other than defending
+        player, you may create a token that's a copy of this creature that's tapped
+        and attacking that player or a planeswalker they control. If one or more tokens
+        are created this way, exile the tokens at end of combat.
+      meaning: mtg:myriad
+      types:
+      - Triggered
+      written_as: 'Myriad '
+    Ninjutsu:
+      description: 'Return an unblocked attacker you control to hand: Put this card
+        onto the battlefield from your hand tapped and attacking.   Commander ninjutsu  [cost]
+        (Return an unblocked attacker you control to hand: Put this card onto the
+        battlefield from your hand or the command zone tapped and attacking.'
+      meaning: mtg:ninjutsu
+      types:
+      - Activated
+      written_as: 'Ninjutsu[cost] '
+    Offering:
+      description: You may cast this card any time you could cast an instant by sacrificing
+        a [Subtype] and paying the difference in mana costs between this and the sacrificed
+        [Subtype]. Mana cost includes color.
+      meaning: mtg:offering
+      types:
+      - Static
+      written_as: '[Subtype] Offering '
+    Outlast:
+      description: '[Cost], : Put a +1/+1 counter on this creature. Activate only
+        as a sorcery.'
+      meaning: mtg:outlast
+      types:
+      - Activated
+      written_as: 'Outlast[cost] '
+    Overload:
+      description: You may cast this spell for its overload cost. If you do, change
+        its text by replacing all instances of 'target' with 'each'.
+      meaning: mtg:overload
+      types:
+      - Static
+      - Static
+      written_as: 'Overload[cost] '
+    Partner:
+      alt_description: When this creature enters the battlefield, target player may
+        put [name] into their hand from their library, then shuffle.
+      alt_written_as: 'Partner with [name]   '
+      description: 'You can have two commanders if both have partner.   '
+      meaning: mtg:partner
+      types:
+      - Static
+      - Triggered
+      written_as: 'Partner '
+    Persist:
+      description: "When this creature dies, if it had no -1/-1 counters on it, return\
+        \ it to the battlefield under its owner\u2019s control with a -1/-1 counter\
+        \ on it."
+      meaning: mtg:persist
+      types:
+      - Triggered
+      written_as: 'Persist '
+    Phasing:
+      description: "This phases in or out before you untap during each of your untap\
+        \ steps. While it's phased out, it's treated as though it doesn't exist. \
+        \  Phase out   (While it\u2019s phased out, it\u2019s treated as though it\
+        \ doesn\u2019t exist. It phases in before its controller untaps during their\
+        \ next untap step."
+      meaning: mtg:phasing
+      types:
+      - Static
+      written_as: 'Phasing '
+    Plot:
+      description: You may pay [cost] and exile this card from your hand. Cast it
+        as a sorcery on a later turn without paying its mana cost. Plot only as a
+        sorcery.
+      meaning: mtg:plot
+      types:
+      - Static
+      written_as: 'Plot[cost] '
+    Poisonous:
+      description: Whenever this creature deals combat damage to a player, that player
+        gets N poison counters.
+      meaning: mtg:poisonous
+      types:
+      - Triggered
+      written_as: Poisonous N
+    Protection:
+      description: This can't be blocked, targeted, dealt damage, enchanted, or equipped
+        by anything [quality].
+      meaning: mtg:protection
+      types:
+      - Static
+      written_as: 'Protection from [quality] '
+    Prototype:
+      description: You may cast this spell with different mana cost, color, and size.
+        It keeps its abilities and types.
+      meaning: mtg:prototype
+      types:
+      - Static
+      written_as: 'Prototype '
+    Provoke:
+      description: Whenever this creature attacks, you may have target creature defending
+        player controls untap and block it if able.
+      meaning: mtg:provoke
+      types:
+      - Triggered
+      written_as: 'Provoke '
+    Prowess:
+      description: Whenever you cast a noncreature spell, this creature gets +1/+1
+        until end of turn.
+      meaning: mtg:prowess
+      types:
+      - Triggered
+      written_as: 'Prowess '
+    Prowl:
+      description: You may cast this for its prowl cost if you dealt combat damage
+        to a player this turn with a [subtype].
+      meaning: mtg:prowl
+      types:
+      - Static
+      written_as: 'Prowl[cost] '
+    Rampage:
+      description: Whenever this creature becomes blocked, it gets +N/+N until end
+        of turn for each creature blocking it beyond the first.
+      meaning: mtg:rampage
+      types:
+      - Triggered
+      written_as: Rampage N
+    Ravenous:
+      description: This creature enters the battlefield with X +1/+1 counters on it.
+        If X is 5 or more, draw a card when it enters.
+      meaning: mtg:ravenous
+      types:
+      - Static
+      - Triggered
+      written_as: 'Ravenous '
+    Reach:
+      description: This creature can block creatures with flying.
+      meaning: mtg:reach
+      types:
+      - Static
+      written_as: 'Reach '
+    Read_ahead:
+      description: Choose a chapter and start with that many lore counters. Add one
+        after your draw step. Skipped chapters don't trigger. Sacrifice after III.
+      meaning: mtg:read_ahead
+      types:
+      - Static
+      written_as: 'Read ahead '
+    Rebound:
+      description: If this spell was cast from your hand, instead of putting it into
+        your graveyard as it resolves, exile it and, at the beginning of your next
+        upkeep, you may cast this card from exile without paying its mana cost.
+      meaning: mtg:rebound
+      types:
+      - Static
+      written_as: 'Rebound '
+    Reconfigure:
+      description: '[Cost]: Attach to target creature you control; or unattach from
+        a creature. Reconfigure only as a sorcery. While attached this isn''t a creature.'
+      meaning: mtg:reconfigure
+      types:
+      - Activated
+      - Activated
+      written_as: 'Reconfigure[cost] '
+    Recover:
+      description: When a creature is put into your graveyard from the battlefield,
+        you may pay [cost]. If you do, return this card from your graveyard to your
+        hand. Otherwise, exile this card.
+      meaning: mtg:recover
+      types:
+      - Triggered
+      written_as: 'Recover[cost] '
+    Reinforce:
+      description: '[Cost], Discard this card: Put N +1/+1 counters on target creature.'
+      meaning: mtg:reinforce
+      types:
+      - Activated
+      written_as: "Reinforce N \u2014 [cost] "
+    Renown:
+      description: Whenever this creature deals combat damage to a player, if it isn't
+        renowned, put N +1/+1 counter on it and it becomes renowned.
+      meaning: mtg:renown
+      types:
+      - Triggered
+      written_as: Renown N
+    Replicate:
+      description: When you cast this spell, copy it for each time you paid its replicate
+        cost. You may choose new targets for the copies.
+      meaning: mtg:replicate
+      types:
+      - Static
+      - Triggered
+      written_as: 'Replicate[cost] '
+    Retrace:
+      description: You may cast this card from your graveyard by discarding a land
+        card as an additional cost to cast it.
+      meaning: mtg:retrace
+      types:
+      - Static
+      written_as: 'Retrace '
+    Riot:
+      description: This creature enters the battlefield with your choice of a +1/+1
+        counter or haste.
+      meaning: mtg:riot
+      types:
+      - Static
+      written_as: 'Riot '
+    Ripple:
+      description: When you cast this spell, you may reveal the top N cards of your
+        library. You may cast any revealed cards with the same name as this spell
+        without paying their mana costs. Put the rest on the bottom of your library.
+      meaning: mtg:ripple
+      types:
+      - Triggered
+      written_as: Ripple N
+    Saddle:
+      description: 'Tap any number of other creatures you control with total power
+        N or more: This Mount becomes saddled until end of turn. Saddle only as a
+        sorcery.'
+      meaning: mtg:saddle
+      types:
+      - Activated
+      written_as: Saddle N
+    Scavenge:
+      description: 'Exile this card from your graveyard: Put a number of +1/+1 counters
+        equal to this card''s power on target creature. Scavenge only as a sorcery.'
+      meaning: mtg:scavenge
+      types:
+      - Activated
+      written_as: 'Scavenge[cost] '
+    Shadow:
+      description: This creature can block or be blocked by only creatures with shadow.
+      meaning: mtg:shadow
+      types:
+      - Evasion
+      written_as: 'Shadow '
+    Shroud:
+      description: "This permanent or player can\u2019t be the target of spells or\
+        \ abilities."
+      meaning: mtg:shroud
+      types:
+      - Static
+      written_as: 'Shroud '
+    Skulk:
+      description: This creature can't be blocked by creatures with greater power.
+      meaning: mtg:skulk
+      types:
+      - Evasion
+      written_as: 'Skulk '
+    Solved:
+      description: At the beginning of your end step, if [condition] and this Case
+        is not solved, it becomes solved.
+      meaning: mtg:solved
+      types:
+      - Static
+      written_as: 'Solved '
+    Soulbond:
+      description: You may pair this creature with another unpaired creature when
+        either enters the battlefield. They remain paired for as long as you control
+        both of them.
+      meaning: mtg:soulbond
+      types:
+      - Triggered
+      - Triggered
+      written_as: 'Soulbond '
+    Soulshift:
+      description: When this creature dies, you may return target Spirit card with
+        mana value N or less from your graveyard to your hand.
+      meaning: mtg:soulshift
+      types:
+      - Triggered
+      written_as: Soulshift N
+    Space_sculptor:
+      description: "Space Beleren divides the battlefield into alpha, beta, and gamma\
+        \ sectors. If a creature isn\u2019t assigned to a sector, its controller assigns\
+        \ it to one. Opponents assign first."
+      meaning: mtg:space_sculptor
+      types:
+      - Static
+      written_as: 'Space sculptor '
+    Spectacle:
+      description: You may cast this spell for its spectacle cost rather than its
+        mana cost if an opponent lost life this turn.
+      meaning: mtg:spectacle
+      types:
+      - Static
+      written_as: 'Spectacle[cost] '
+    Splice:
+      description: "As you cast a(n [quality] spell, you may reveal this card from\
+        \ your hand and pay its splice cost. If you do, add this card\u2019s effects\
+        \ to that spell."
+      meaning: mtg:splice
+      types:
+      - Static
+      written_as: 'Splice onto [quality][cost] '
+    Split_second:
+      description: As long as this spell is on the stack, players can't cast spells
+        or activate abilities that aren't mana abilities.
+      meaning: mtg:split_second
+      types:
+      - Static
+      written_as: 'Split second '
+    Spree:
+      description: Choose one or more additional costs.
+      meaning: mtg:spree
+      types:
+      - Static
+      written_as: 'Spree '
+    Squad:
+      description: As an additional cost to cast this spell, you may pay [cost] any
+        number of times. When this creature enters the battlefield, create that many
+        tokens that are copies of it.
+      meaning: mtg:squad
+      types:
+      - Static
+      - Triggered
+      written_as: 'Squad[cost] '
+    Storm:
+      description: When you cast this spell, copy it for each spell cast before it
+        this turn. You may choose new targets for the copies.
+      meaning: mtg:storm
+      types:
+      - Triggered
+      written_as: 'Storm '
+    Sunburst:
+      description: This enters the battlefield with a [+1/+1 or charge] counter on
+        it for each color of mana spent to cast it.
+      meaning: mtg:sunburst
+      types:
+      - Static
+      written_as: 'Sunburst '
+    Surge:
+      description: You may cast a spell for its surge cost if you or a teammate have
+        cast another spell in the same turn.
+      meaning: mtg:surge
+      types:
+      - Static
+      written_as: 'Surge[cost] '
+    Suspend:
+      description: Rather than cast this card from your hand, you may pay [cost] and
+        exile it with N time counters on it. At the beginning of your upkeep, remove
+        a time counter. When the last is removed, you may cast it without paying its
+        mana cost. It has haste.
+      meaning: mtg:suspend
+      types:
+      - Static
+      - Triggered
+      - Triggered
+      written_as: "Suspend N \u2014 [cost] "
+    Toxic:
+      description: Players dealt combat damage by this creature also get N poison
+        counter(s.
+      meaning: mtg:toxic
+      types:
+      - Static
+      written_as: Toxic N
+    Training:
+      description: Whenever this creature attacks with another creature with greater
+        power, put a +1/+1 counter on this creature.
+      meaning: mtg:training
+      types:
+      - Triggered
+      written_as: 'Training '
+    Trample:
+      alt_description: This creature can deal excess combat damage to the controller
+        of the planeswalker it's attacking.
+      alt_written_as: 'Trample over planeswalkers   '
+      description: 'This creature can deal excess combat damage to a player, planeswalker
+        or battle it''s attacking.   '
+      meaning: mtg:trample
+      types:
+      - Static
+      written_as: 'Trample '
+    Transfigure:
+      description: '[Cost], Sacrifice this permanent: Search your library for a creature
+        card with the same mana value as this permanent, put that card onto the battlefield,
+        then shuffle. Transfigure only as a sorcery.'
+      meaning: mtg:transfigure
+      types:
+      - Activated
+      written_as: 'Transfigure[cost] '
+    Transmute:
+      description: '[cost], Discard this card: Search your library for a card with
+        the same mana value as this card, reveal it, put it into your hand, then shuffle.
+        Transmute only as a sorcery.'
+      meaning: mtg:transmute
+      types:
+      - Activated
+      written_as: 'Transmute[cost] '
+    Tribute:
+      description: As this creature enters the battlefield, an opponent of your choice
+        may place N +1/+1 counters on it.
+      meaning: mtg:tribute
+      types:
+      - Static
+      written_as: Tribute N
+    Umbra_armor:
+      description: If enchanted permanent would be destroyed, instead remove all damage
+        marked on it and destroy this Aura.
+      meaning: mtg:umbra_armor
+      types:
+      - Static
+      written_as: 'Umbra armor '
+    Undaunted:
+      description: This spell costs  less to cast for each opponent.
+      meaning: mtg:undaunted
+      types:
+      - Static
+      written_as: 'Undaunted '
+    Undying:
+      description: When this creature dies, if it had no +1/+1 counters on it, return
+        it to the battlefield under its owner's control with a +1/+1 counter on it.
+      meaning: mtg:undying
+      types:
+      - Triggered
+      written_as: 'Undying '
+    Unearth:
+      description: Return this card from your graveyard to the battlefield. It gains
+        haste. Exile it at the beginning of the next end step or if it would leave
+        the battlefield. Unearth only as a sorcery.
+      meaning: mtg:unearth
+      types:
+      - Activated
+      written_as: 'Unearth[cost] '
+    Unleash:
+      description: You may have this creature enter the battlefield with a +1/+1 counter
+        on it. It can't block as long as it has a +1/+1 counter on it.
+      meaning: mtg:unleash
+      types:
+      - Static
+      - Static
+      written_as: 'Unleash '
+    Vanishing:
+      description: This permanent enters the battlefield with N time counters on it.
+        At the beginning of your upkeep, remove a time counter from it. When the last
+        is removed, sacrifice it.
+      meaning: mtg:vanishing
+      types:
+      - Static
+      - Triggered
+      - Triggered
+      written_as: Vanishing N
+    Vigilance:
+      description: Attacking doesn't cause this creature to tap.
+      meaning: mtg:vigilance
+      types:
+      - Static
+      written_as: 'Vigilance '
+    Visit:
+      description: Whenever you roll to visit your Attractions, if the result is equal
+        to a number that is lit up on this Attraction, [effect]
+      types:
+      - Triggered
+      written_as: Visit
+    Ward:
+      description: Whenever this creature becomes the target of a spell or ability
+        an opponent controls, counter it unless that player pays [cost].
+      meaning: mtg:ward
+      types:
+      - Triggered
+      written_as: 'Ward[cost] '
+    Wither:
+      description: This deals damage to creatures in the form of -1/-1 counters.
+      meaning: mtg:wither
+      types:
+      - Static
+      written_as: 'Wither '
+  see_also: mtg:Keyword_ability
