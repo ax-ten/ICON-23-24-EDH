@@ -3,9 +3,17 @@ Progetto di Ingegneria della Conoscenza dell'anno accademico 2023-2024 all'Unive
 ## Presentazione
 Da qualche anno il bacino di utenti del gioco di carte di Magic: the Gathering è cresciuto a dismisura, così come l'attenzione dei giocatori veterani al formato di gioco 'Commander'. L'obiettivo principale di questo progetto è semplificare il processo di creazione di mazzi (Deckmaking) per gli utenti meno esperti.
 ###### Sviluppato da:
-<img data-component="Avatar" alt="ax-ten" size="20" src="https://avatars.githubusercontent.com/u/38043310?v=4&amp;size=40" data-testid="github-avatar" aria-label="ax-ten" height="20" width="20" class="Avatar__StyledAvatar-sc-2lv0r8-0 gMUnCp"> **Damato Luigi Lele**\
-  Matricola: 743476\
-  l.damato15@uniba.it 
+<table>
+  <tr>
+      <td><img src="https://avatars.githubusercontent.com/u/38043310?v=4" height="83" class="Avatar__StyledAvatar-sc-2lv0r8-0 gMUnCp"> </td>
+      <td>
+        <span><strong>Damato Luigi Lele</strong></span><br>
+        <span>Matricola: 743476</span><br>
+        <span>l.damato15@uniba.it</span>
+      </td>
+  </tr>
+</table>
+
 
 ## Come funziona 
 Consultare la [Documentazione](https://github.com/ax-ten/ICON-23-24-EDH/blob/main/doc/Documentazione.pdf)
@@ -22,6 +30,7 @@ Il popolamento di fatti nella KB avviene automaticamente all'aggiornamento dei d
 #### Ontologia
 Espansa sulla base dell'ontologià già creata da @cmdoret: https://github.com/cmdoret/mtg_ontology\
 È stato utilizzato l'editor visivo open source Protégé per la sua creazione, per consultarla in Python è stata invece usata la libreria Owlready2
+___
 
 #### Installazione e Avvio
 `pip install -r requirements.txt`\
@@ -33,7 +42,7 @@ Espansa sulla base dell'ontologià già creata da @cmdoret: https://github.com/c
 
 ## Conclusioni
 Il progetto può certamente essere esteso : #to-do
-
+___
 ## Altre informazioni
 ### Cos'è Magic: the Gathering.
 Si tratta di un [gioco di carte collezionabili](https://it.wikipedia.org/wiki/Gioco_di_carte_collezionabili) la cui prima espansione uscì nel 1993, in cui le carte rappresentano le magie a disposizione di un incantatore che si confronta in una battaglia con uno o più altri maghi. È un sistema di regole molto complesse, in quanto ogni espansione pubblicata aggiunge regole, carte e tipi di carte, ai quali si aggiunge la complessità inventata dai giocatori stessi, che creano nuovi formati, ognuno con regole diverse.
