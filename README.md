@@ -19,9 +19,9 @@ Da qualche anno il bacino di utenti del gioco di carte di Magic: the Gathering �
 Consultare la [Documentazione](https://github.com/ax-ten/ICON-23-24-EDH/blob/main/doc/Documentazione.pdf).
 
 #### Reccomender System
-Esistono due sistemi di raccomandazione nel progetto:\
-- il primo accetta il nome di un commander e consiglia all'utente le migliori carte da inserire nel mazzo, in base a quelle già usate da altri utenti\
-- il secondo accetta invece il profilo dell'utente su un sito di deckbuilding (come Archidekt, Moxfield, EDHREC, eccetera) e consiglia\ un commander in base alle preferenze degli altri utenti che hanno costruito mazzi simili a quelli sul profilo.\
+Esistono due sistemi di raccomandazione nel progetto:
+- il primo accetta il nome di un commander e consiglia all'utente le migliori carte da inserire nel mazzo, in base a quelle già usate da altri utenti
+- il secondo accetta invece il profilo dell'utente su un sito di deckbuilding (come Archidekt, Moxfield, EDHREC, eccetera) e consiglia un commander in base alle preferenze degli altri utenti che hanno costruito mazzi simili a quelli sul profilo.
 
 #### Knowledge Base
 È stata utilizzata la libreria **Pytholog** per Python, basata sul linguaggio di programmazione logica Prolog.\
