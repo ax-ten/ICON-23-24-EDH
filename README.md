@@ -3,9 +3,9 @@ Progetto di Ingegneria della Conoscenza dell'anno accademico 2023-2024 all'Unive
 ## Presentazione
 Da qualche anno il bacino di utenti del gioco di carte di Magic: the Gathering è cresciuto a dismisura, così come l'attenzione dei giocatori veterani al formato di gioco 'Commander'. L'obiettivo principale di questo progetto è semplificare il processo di creazione di mazzi (Deckmaking) per gli utenti meno esperti.
 ###### Sviluppato da:
-- Damato Luigi Lele\
-  matricola: 743476\
-  l.damato15@uniba.it
+- **Damato Luigi Lele**\
+  Matricola: 743476\
+  l.damato15@uniba.it <img style="height:auto;" alt="" src="https://avatars.githubusercontent.com/u/38043310?v=4" width="260" height="260" class="avatar avatar-user width-full border color-bg-default">
 
 ## Come funziona 
 Consultare la [Documentazione](https://github.com/ax-ten/ICON-23-24-EDH/blob/main/doc/Documentazione.pdf)
@@ -16,15 +16,15 @@ il primo accetta il nome di un commander e consiglia all'utente le migliori cart
 il secondo accetta invece il profilo dell'utente su un sito di deckbuilding (come Archidekt, Moxfield, EDHREC, eccetera) e consiglia\ un commander in base alle preferenze degli altri utenti che hanno costruito mazzi simili a quelli sul profilo.\
 
 #### Knowledge Base
-È stata utilizzata la libreria Pytholog per Python, basata sul linguaggio di programmazione logica Prolog.
+È stata utilizzata la libreria Pytholog per Python, basata sul linguaggio di programmazione logica Prolog.\
 Il popolamento di fatti nella KB avviene automaticamente all'aggiornamento dei dataset
 
 #### Ontologia
-Espansa sulla base dell'ontologià già creata da @cmdoret: https://github.com/cmdoret/mtg_ontology
+Espansa sulla base dell'ontologià già creata da @cmdoret: https://github.com/cmdoret/mtg_ontology\
 È stato utilizzato l'editor visivo open source Protégé per la sua creazione, per consultarla in Python è stata invece usata la libreria Owlready2
 
 #### Installazione e Avvio
-`pip install -r requirements.txt`
+`pip install -r requirements.txt`\
 è necessario eseguire il file `main.py`
 
 #### Struttura della Repository
