@@ -1,15 +1,15 @@
 # ICON-23-24-EDH
 Progetto di Ingegneria della Conoscenza dell'anno accademico 2023-2024 all'Università degli Studi di Bari (Informatica)
 ## Presentazione
-Da qualche anno il bacino di utenti del gioco di carte di Magic: the Gathering è cresciuto a dismisura, così come l'attenzione dei giocatori veterani al formato di gioco 'Commander'. L'obiettivo principale di questo progetto è semplificare il processo di creazione di mazzi (Deckmaking) per gli utenti meno esperti.
+Da qualche anno molti più appassionati del gioco di carte di Magic: the Gathering si sono approcciati al formato di gioco 'Commander'. L'obiettivo principale di questo progetto è semplificare il processo di creazione di mazzi (Deckmaking) per gli utenti meno esperti.
 ###### Sviluppato da:
 <table>
   <tr>
       <td><img src="https://avatars.githubusercontent.com/u/38043310?v=4" height="83" class="Avatar__StyledAvatar-sc-2lv0r8-0 gMUnCp"> </td>
       <td>
-        <span><strong>Damato Luigi Lele</strong></span><br>
-        <span>Matricola: 743476</span><br>
-        <span>l.damato15@uniba.it</span>
+        <strong>Damato Luigi Lele</strong><br>
+        Matricola: 743476<br>
+        l.damato15@uniba.it
       </td>
   </tr>
 </table>
@@ -33,8 +33,8 @@ Espansa sulla base dell'ontologià già creata da @cmdoret: https://github.com/c
 ___
 
 #### Installazione e Avvio
-`pip install -r requirements.txt`.\
-è necessario eseguire il file `main.py`.
+Per installare i requisiti: `pip install -r requirements.txt`.\
+Per avviare, esegui `main.py`.
 
 #### Struttura della Repository
 - [/data](https://github.com/ax-ten/ICON-23-24-EDH/tree/main/data):  mazzi da Archidekt, Ontologia.
