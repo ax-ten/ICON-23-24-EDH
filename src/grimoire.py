@@ -9,9 +9,12 @@ filename_translator = {ord(i):None for i in '".?/:;><'}
 PATH = "./data/fetched/grimoire/"
 
 class Grimoire():
-    def __init__(self, omnicomprehensive=False):
+    def __init__(self):
         self.cards = {} # = {card:[deck_id:int]}
-        if omnicomprehensive:
+
+    def make_omni(self):
+        OMNI = 'OMNI'
+        if load(OMNI) is None:
             CSV_PATH = "./data/oracle_cards/oracle_cards.csv"
     
             with open(CSV_PATH, 'r',encoding="UTF-8", errors="ignore") as infile:
@@ -21,6 +24,12 @@ class Grimoire():
                     card=Card()
                     card.load_csv(row)
                     self.append(card,deck_id=0)
+                    
+                    # self.append(Card().load_csv(row),deck_id=0)
+            
+            self.save(OMNI)
+        else:
+            self.cards = load(OMNI,display=False).cards
 
     def __iter__(self):         return iter(self.cards)
     def __len__(self):          return len(self.cards)
@@ -83,7 +92,7 @@ def merge(g_A:Grimoire, g_B:Grimoire):
     return grim
 
 
-def load(filename:str, ask:bool=False) -> Grimoire:
+def load(filename:str, ask:bool=False, display:bool=True) -> Grimoire:
     """_summary_
     Args:
         filename (str): nome del file, senza percorso, ne` estensione
@@ -95,7 +104,8 @@ def load(filename:str, ask:bool=False) -> Grimoire:
     grimoire_path = rf"{PATH}{filename}.pkl"
 
     if os.path.exists(grimoire_path):
-        print(f"Carico le carte dal grimorio di {filename}")
+        if display:
+            print(f"Carico le carte dal grimorio di {filename}")    
         with open(grimoire_path, "rb") as infile:
             return pickle.load(infile)#grimoire
     

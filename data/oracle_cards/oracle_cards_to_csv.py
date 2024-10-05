@@ -1,5 +1,5 @@
 import json, csv
-FILENAME = "oracle-cards-20241004090213.json"
+FILENAME = "oracle-cards-20241005090218.json"
 
 
 def read_cards(path = f"./data/oracle_cards/{FILENAME}")-> dict:#of dicts

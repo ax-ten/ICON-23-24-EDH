@@ -362,8 +362,8 @@ class Card():
                 **{"power": [self.power]}
                 }
         if additional_data:
-            for key, value_func in additional_data.items():
-                flat[key] = value_func(self)
+            for key, func in additional_data.items():
+                flat[key] = func(self)
         
         return flat
     
@@ -407,23 +407,26 @@ class Card():
         HIGH = 10
         prod = self.get_mana_production()
         if 'for each' in prod['Note']: return HIGH
-
+        if prod['or']:
+            return max(prod.values())
+        else:
+            return sum(v for k,v in prod.items() if k in 'WURBGC')
         
     
     def __len__(self) -> int :
         return len(self.name)
     
-    def has_active_abilities(self) -> bool:
-        return ':' in self.text
+    def count_active_abilities(self) -> bool:
+        return self.text.count(':')
     
     def has_mana_production(self) -> bool:
         return 'add ' in self.text
     
-    def has_trigger_abilities(self) -> bool:
+    def count_trigger_abilities(self) -> bool:
         import re
         triggered_ability_pattern = r'\b(Whenever|When|At the beginning of|At the end of|If)\b'
-        match = re.search(triggered_ability_pattern, self.text)
-        return match is not None
+        matches = re.findall(triggered_ability_pattern, self.text)
+        return len(matches)
     
 
     def is_legal(self, format:Format=Format.commander) -> bool:
