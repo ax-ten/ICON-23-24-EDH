@@ -19,17 +19,14 @@ Da qualche anno molti più appassionati del gioco di carte di Magic: the Gatheri
 Consultare la [Documentazione](https://github.com/ax-ten/ICON-23-24-EDH/blob/main/doc/Documentazione.pdf).
 
 #### Reccomender System
-Esistono due sistemi di raccomandazione nel progetto:
-- il primo accetta il nome di un commander e consiglia all'utente le migliori carte da inserire nel mazzo, in base a quelle già usate da altri utenti
-- il secondo accetta invece il profilo dell'utente su un sito di deckbuilding (come Archidekt, Moxfield, EDHREC, eccetera) e consiglia un commander in base alle preferenze degli altri utenti che hanno costruito mazzi simili a quelli sul profilo.
-
+Il sistema accetta il profilo dell'utente su un sito di deckbuilding (Archidekt) e consiglia un commander in base alle preferenze degli altri utenti che hanno costruito mazzi simili a quelli sul profilo.
 #### Knowledge Base
-È stata utilizzata la libreria **Pytholog** per Python, basata sul linguaggio di programmazione logica Prolog.\
+È stata utilizzata la libreria **PySWIP** per Python, basata sul linguaggio di programmazione logica Prolog.\
 Il popolamento di fatti nella KB avviene automaticamente all'aggiornamento dei dataset.
 
 #### Ontologia
 Espansa sulla base dell'ontologià già creata da @cmdoret: https://github.com/cmdoret/mtg_ontology.\
-È stato utilizzato l'editor visivo open source **Protégé** per la sua creazione, per consultarla in Python è stata invece usata la libreria **Owlready2**.
+Per consultarla e modificarla in Python è stata usata la libreria **Owlready2**.
 ___
 
 #### Installazione e Avvio
@@ -37,8 +34,11 @@ Per installare i requisiti: `pip install -r requirements.txt`.\
 Per avviare, esegui `main.py`.
 
 #### Struttura della Repository
-- [/data](https://github.com/ax-ten/ICON-23-24-EDH/tree/main/data):  mazzi da Archidekt, Ontologia.
-- [/src](https://github.com/ax-ten/ICON-23-24-EDH/tree/main/src): codice sorgente Python.
+- [/data](https://github.com/ax-ten/ICON-23-24-EDH/tree/main/data):  Ontologia, qui verranno salvati i mazzi da Archidekt.
+- [/doc](https://github.com/ax-ten/ICON-23-24-EDH/tree/main/doc):  documentazione
+- [/src](https://github.com/ax-ten/ICON-23-24-EDH/tree/main/src): codice sorgente Python con le classi utilizzate principalemnte
+- [/old](https://github.com/ax-ten/ICON-23-24-EDH/tree/main/old): prove di codice e insieme di snippets, da passare a origin/dev
+- [/keywords](https://github.com/ax-ten/ICON-23-24-EDH/tree/main/Keywords): keywords delle carte in YAML, con codice per ottenerle
 
 ## Conclusioni
 Il progetto può certamente essere esteso :

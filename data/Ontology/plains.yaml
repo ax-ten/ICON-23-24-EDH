@@ -1,0 +1,11 @@
+id: example:plains
+name: Plains
+color: white
+type_line: Basic Land - Plains
+card_type: Land
+card_subtype: Plains
+card_supertype: Basic
+artist: Titus Lunter
+flavor_text: "Searching for a vanished caravan that was bound for Silverymoon, you’ve come to a bank of mysterious fog."
+card_set: Adventures in the Forgotten Realms
+rarity: common
