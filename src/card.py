@@ -350,7 +350,7 @@ class Card():
             "mana_cost": [self.mana_cost],
             "rarity": [rarity_mapping[self.rarity]],
             # **{f"mana_value_{k}": [v] for k, v in self.mana_value.items()},
-            **{f"color_identity_{k}": [int(v)] for k, v in self.color_identity.items()},
+            # **{f"color_identity_{k}": [int(v)] for k, v in self.color_identity.items()},
             # **{f"color_identity_none": int(all(v is False for v in self.color_identity.values()))},
             # **{f"colors_{k}": [int(v)] for k, v in self.colors.items()},
         }
@@ -367,6 +367,49 @@ class Card():
         
         return flat
     
+    #MOLTO WIP, non usare #To-Do
+    def get_mana_production(self)->dict: 
+        match = re.search(r'\.?\s*(.*?)\s*Add\s+(.*)\.', self.text)
+        if not match:
+            return None
+        
+        #suppongo ci sia un costo di attivazione
+        cost, mana_produced = self.text.split(':').strip()
+        mana_dict = {"W": 0, "U": 0, "R": 0, "B": 0, "G": 0, "C":0, "Or": True, "Note": "", "cost":cost}
+
+        # trova i simboli tra {}
+        mana_symbols = re.findall(r'\{([WUBRGC])\}', mana_produced)
+
+        if mana_symbols:
+            # Add {*} for each [...]
+            if "for each" in mana_produced:
+                quality_match = re.search(r'for each (\w+)', mana_produced)
+                if quality_match:
+                    x = quality_match.group(1)
+                    for symbol in mana_symbols:
+                        mana_dict[symbol] = "X"
+                    mana_dict["Note"] = f"for each {x}"
+            else:
+                for symbol in mana_symbols:
+                    mana_dict[symbol] += 1
+                    mana_dict["Or"] = False
+
+        # Add X mana of any color
+        QUANTITY = {"one":1, "two":2, "three":3, "four":4, "five":5, "X":"X"}
+        quantity_match = re.search(r'Add (\w+) mana of any color', mana_produced)
+        if quantity_match:
+            x = quality_match.group(1)
+            for symbol in "WURBG":
+                mana_dict[symbol] = QUANTITY[x]
+        return  mana_dict
+    
+    def abs_mana_production(self) ->int:
+        HIGH = 10
+        prod = self.get_mana_production()
+        if 'for each' in prod['Note']: return HIGH
+
+        
+    
     def __len__(self) -> int :
         return len(self.name)
     
@@ -375,6 +418,13 @@ class Card():
     
     def has_mana_production(self) -> bool:
         return 'add ' in self.text
+    
+    def has_trigger_abilities(self) -> bool:
+        import re
+        triggered_ability_pattern = r'\b(Whenever|When|At the beginning of|At the end of|If)\b'
+        match = re.search(triggered_ability_pattern, self.text)
+        return match is not None
+    
 
     def is_legal(self, format:Format=Format.commander) -> bool:
         return self.legalities[format.name]
@@ -427,42 +477,6 @@ def colors(ci:list) -> dict:
     translator = {'W':'White','U':'Blue','B':'Black','R':'Red','G':'Green'}
     return {k: k in ci for k,v in translator.items()}
 
-
-#MOLTO WIP, non usare #To-Do
-def get_mana_production(self)->dict: 
-    match = re.search(r'\.?\s*(.*?)\s*Add\s+(.*)\.', self.text)
-    if not match:
-        return None
-    
-    #suppongo ci sia un costo di attivazione
-    cost, mana_produced = self.text.split(':').strip()
-    mana_dict = {"W": 0, "U": 0, "R": 0, "B": 0, "G": 0, "C":0, "Or": True, "Note": "", "cost":cost}
-
-    # trova i simboli tra {}
-    mana_symbols = re.findall(r'\{([WUBRGC])\}', mana_produced)
-
-    if mana_symbols:
-        # Add {*} for each [...]
-        if "for each" in mana_produced:
-            quality_match = re.search(r'for each (\w+)', mana_produced)
-            if quality_match:
-                x = quality_match.group(1)
-                for symbol in mana_symbols:
-                    mana_dict[symbol] = "X"
-                mana_dict["Note"] = f"for each {x}"
-        else:
-            for symbol in mana_symbols:
-                mana_dict[symbol] += 1
-                mana_dict["Or"] = False
-
-    # Add X mana of any color
-    QUANTITY = {"one":1, "two":2, "three":3, "four":4, "five":5, "X":"X"}
-    quantity_match = re.search(r'Add (\w+) mana of any color', mana_produced)
-    if quantity_match:
-        x = quality_match.group(1)
-        for symbol in "WURBG":
-            mana_dict[symbol] = QUANTITY[x]
-    return  mana_dict
 
 
 def split_typeline(typeline:str) -> tuple: 
