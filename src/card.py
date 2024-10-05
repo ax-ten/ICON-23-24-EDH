@@ -374,7 +374,13 @@ class Card():
             return None
         
         #suppongo ci sia un costo di attivazione
-        cost, mana_produced = self.text.split(':').strip()
+        try:
+            cost, mana_produced = self.text.split(':',1)
+        except Exception as e:
+            # print(e)
+            # print(self)
+            # print(self.text)
+            cost, mana_produced = self.text.split('.',1)
         mana_dict = {"W": 0, "U": 0, "R": 0, "B": 0, "G": 0, "C":0, "Or": True, "Note": "", "cost":cost}
 
         # trova i simboli tra {}
@@ -398,7 +404,7 @@ class Card():
         QUANTITY = {"one":1, "two":2, "three":3, "four":4, "five":5, "X":"X"}
         quantity_match = re.search(r'Add (\w+) mana of any color', mana_produced)
         if quantity_match:
-            x = quality_match.group(1)
+            x = quantity_match.group(1)
             for symbol in "WURBG":
                 mana_dict[symbol] = QUANTITY[x]
         return  mana_dict
@@ -406,9 +412,10 @@ class Card():
     def abs_mana_production(self) ->int:
         HIGH = 10
         prod = self.get_mana_production()
+        if prod is None: return 0
         if 'for each' in prod['Note']: return HIGH
-        if prod['or']:
-            return max(prod.values())
+        if prod['Or']:
+            return max([v for k,v in prod.items() if k in 'WURBGC'])
         else:
             return sum(v for k,v in prod.items() if k in 'WURBGC')
         
