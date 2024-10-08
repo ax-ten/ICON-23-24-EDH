@@ -89,18 +89,21 @@ class Grimoire():
     def vectorize(self, do_types=True, do_subtypes=False, do_keywords=False):
         from collections import Counter as C
         vector = {}
-        for card in self:
-            if do_types: vector = C(vector) + C(count(self, card.types))
-            if do_subtypes:  vector = C(vector) + C(count(self, card.sub_types))
-            if do_keywords:  vector = C(vector) + C(count(self, card.keywords))
+        total_len = 0
+        for card, ids in self.items():
+            freq = len(ids)
+            if do_types: vector = C(vector) + C(count(self, card.types, freq))
+            if do_subtypes:  vector = C(vector) + C(count(self, card.sub_types, freq))
+            if do_keywords:  vector = C(vector) + C(count(self, card.keywords, freq))
+            total_len += freq
 
-        return vector
+        return vector, total_len
 
 
-def count(grim:Grimoire, dict):
+def count(grim:Grimoire, dict, freq):
     vector = {}
     for type in dict:
-        vector[type] = 1
+        vector[type] = freq
     return vector
 
         
@@ -262,7 +265,6 @@ def handle_cards(check_if_playable):
     while len(handled_decks) < len(decks_to_fetch):
         try:
             response, deck_id = queue.get(timeout=10)
-            print(response.json())
         except Empty:
             print("Non riesco ad aggiungere altre carte, procedo oltre                \n")
             break
