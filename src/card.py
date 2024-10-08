@@ -413,17 +413,18 @@ class Card():
     def __len__(self) -> int :
         return len(self.name)
     
-    def has_active_abilities(self) -> bool:
-        return ':' in self.text
     
-    def has_mana_production(self) -> bool:
-        return 'add ' in self.text
+    def count_mana_production(self) -> int:
+        return self.text.count('add ')
     
-    def has_trigger_abilities(self) -> bool:
+    def count_trigger_abilities(self) -> int:
         import re
         triggered_ability_pattern = r'\b(Whenever|When|At the beginning of|At the end of|If)\b'
-        match = re.search(triggered_ability_pattern, self.text)
-        return match is not None
+        matches = re.findall(triggered_ability_pattern, self.text)
+        return len(matches)
+    
+    def count_active_abilities(self) -> int:
+        return self.text.count(':')
     
 
     def is_legal(self, format:Format=Format.commander) -> bool:

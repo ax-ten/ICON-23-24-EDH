@@ -169,7 +169,7 @@ def fetch(by:By, decks_filename:str, check_if_playable=False, n_thread=5, do_loa
         time.sleep(0.2)          
     
     for t in threads:
-        t.join(5)
+        t.join(timeout=3)
     
     if do_save and len(grimoire)>0:
         decks.save(decks_to_fetch, decks_filename, by)
@@ -222,14 +222,18 @@ def fetch_decklist(decklist:list[Deck], check_if_playable=False, n_thread=3, try
 
 # gestire le risposte
 def handle_cards(check_if_playable):
+    from _queue import Empty
     global grimoire, decks_to_fetch
     handled_decks = {}
     while len(handled_decks) < len(decks_to_fetch):
         try:
-            response, deck_id = queue.get(timeout=4)
-        except:
-            print("Non riesco ad aggiungere altre carte, procedo oltre                ")
+            response, deck_id = queue.get(timeout=10)
+            print(response.json())
+        except Empty:
+            print("Non riesco ad aggiungere altre carte, procedo oltre                \n")
             break
+        except Exception as e:
+            raise(e)
         
         handled_decks[deck_id] = True
         
@@ -263,7 +267,7 @@ def fetch_cards(decks_to_fetch:list):
                 seen[deck.id] = True
 
             response = wait_valid_response(cards_url(deck.id))
-            queue.put((response,deck.id))
+            queue.put((response, deck.id))
             time.sleep(0.4) # per non sovraccaricare la API
     except Exception as e:
         print(f'{e}:  {deck}')
