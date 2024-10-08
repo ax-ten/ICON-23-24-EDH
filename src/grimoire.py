@@ -9,9 +9,12 @@ filename_translator = {ord(i):None for i in '".?/:;><'}
 PATH = "./data/fetched/grimoire/"
 
 class Grimoire():
-    def __init__(self, omnicomprehensive=False):
+    def __init__(self):
         self.cards = {} # = {card:[deck_id:int]}
-        if omnicomprehensive:
+
+    def make_omni(self):
+        OMNI = 'OMNI'
+        if load(OMNI) is None:
             CSV_PATH = "./data/oracle_cards/oracle_cards.csv"
     
             with open(CSV_PATH, 'r',encoding="UTF-8", errors="ignore") as infile:
@@ -21,6 +24,12 @@ class Grimoire():
                     card=Card()
                     card.load_csv(row)
                     self.append(card,deck_id=0)
+                    
+                    # self.append(Card().load_csv(row),deck_id=0)
+            
+            self.save(OMNI)
+        else:
+            self.cards = load(OMNI,display=False).cards
 
     def __iter__(self):         return iter(self.cards)
     def __len__(self):          return len(self.cards)
@@ -31,7 +40,7 @@ class Grimoire():
 
     def __repr__(self) -> str:
         s = ''
-        for card, deckids in self.items():
+        for card in self.keys():
             s= s + f'{card}\n'
         return s
     
@@ -67,11 +76,35 @@ class Grimoire():
         return (deck_aggregates.keys(), np.unique(deck_aggregates.values()))
     
     from typing import Callable
-    def dataframe(self, filters: list[Callable[[Card], bool]] = None, additional_data=None):
+    def dataframe(self, 
+                positive_filters: list[Callable[[Card], bool]] = None, 
+                negative_filters: list[Callable[[Card], bool]] = None, 
+                additional_data=None):
         import pandas as pd
-        flattened_cards = [card.flatten(filters, additional_data) for card in self]
+        flattened_cards = [card.flatten(positive_filters, negative_filters, additional_data) for card in self]
         df = pd.concat([pd.DataFrame(card) for card in flattened_cards], ignore_index=True)
         return df
+    
+
+    def vectorize(self, do_types=True, do_subtypes=False, do_keywords=False):
+        from collections import Counter as C
+        vector = {}
+        for card in self:
+            if do_types: vector = C(vector) + C(count(self, card.types))
+            if do_subtypes:  vector = C(vector) + C(count(self, card.sub_types))
+            if do_keywords:  vector = C(vector) + C(count(self, card.keywords))
+
+        return vector
+
+
+def count(grim:Grimoire, dict):
+    vector = {}
+    for type in dict:
+        vector[type] = 1
+    return vector
+
+        
+
 
 
 # Metodi Statici
@@ -83,7 +116,7 @@ def merge(g_A:Grimoire, g_B:Grimoire):
     return grim
 
 
-def load(filename:str, ask:bool=False) -> Grimoire:
+def load(filename:str, ask:bool=False, display:bool=True) -> Grimoire:
     """_summary_
     Args:
         filename (str): nome del file, senza percorso, ne` estensione
@@ -95,7 +128,8 @@ def load(filename:str, ask:bool=False) -> Grimoire:
     grimoire_path = rf"{PATH}{filename}.pkl"
 
     if os.path.exists(grimoire_path):
-        print(f"Carico le carte dal grimorio di {filename}")
+        if display:
+            print(f"Carico le carte dal grimorio di {filename}")    
         with open(grimoire_path, "rb") as infile:
             return pickle.load(infile)#grimoire
     

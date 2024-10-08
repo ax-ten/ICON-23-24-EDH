@@ -49,6 +49,10 @@ class Color(Enum):
     black = 'B'
     green = 'G'
 
+class SuperType(Enum):
+    Legendary = 0
+    Basic = 1
+    Token = 2
 
 
 @unique
@@ -87,6 +91,11 @@ class Filters(Enum):
             value = lambda card, type_name = type_member.name: type_name in card.types
             setattr(cls, name, value)
 
+        for type_member in SuperType:
+            name = f'is{type_member.name}'  
+            value = lambda card, type_name = type_member.name: type_name in card.super_types
+            setattr(cls, name, value)
+
     @classmethod
     def _generate_legality_filters(cls):
         for format_member in Format:
@@ -100,11 +109,6 @@ class Filters(Enum):
         return obj
     
 Filters._generate_filters()
-
-class SuperType(Enum):
-    Legendary = 0
-    Basic = 1
-    Token = 2
 
 class Card():
     oracle_id : int
@@ -164,6 +168,7 @@ class Card():
 
     def load_dict(self, card_dict:dict):
         oracle = card_dict['oracleCard']
+        
         self.oracle_id = oracle['id']
         self.color_identity = colors(oracle['colorIdentity'])
         self.rarity = card_dict['rarity']
@@ -180,6 +185,7 @@ class Card():
         self.mana_cost = oracle['cmc']
         self.mana_production = oracle['manaProduction']
         self.default_category = oracle['defaultCategory']
+        return self
 
     def search_in_csv(self, oracle_id:str=None, name:str=None):
         CSV_PATH = "./data/oracle_cards/oracle_cards.csv"
@@ -272,7 +278,7 @@ class Card():
         return line+')'
 
     def to_facts(self) -> str:
-        from prolog import PrologFormatter
+
         facts = []
         facts.append(self.line('card'))
         facts.append(self.line('cost', [self.mana_cost]))
@@ -339,11 +345,16 @@ class Card():
     
     CardType = TypeVar('CardType', bound='Card')
     def flatten(self, 
-                filters: list[Filters] = None,
+                positive_filters: list[Filters] = None,
+                negative_filters: list[Filters] = None,
                 additional_data: dict[str, Callable[[CardType], int]] = None
             ) -> dict:
-        for filter in filters:
+        for filter in positive_filters:
             if not filter(self): # questo sarebbe il filtro
+                return {}
+            
+        for filter in negative_filters:
+            if filter(self): # questo sarebbe il filtro
                 return {}
             
         flat = {
@@ -362,8 +373,8 @@ class Card():
                 **{"power": [self.power]}
                 }
         if additional_data:
-            for key, value_func in additional_data.items():
-                flat[key] = value_func(self)
+            for key, func in additional_data.items():
+                flat[key] = func(self)
         
         return flat
     
@@ -374,7 +385,13 @@ class Card():
             return None
         
         #suppongo ci sia un costo di attivazione
-        cost, mana_produced = self.text.split(':').strip()
+        try:
+            cost, mana_produced = self.text.split(':',1)
+        except Exception as e:
+            # print(e)
+            # print(self)
+            # print(self.text)
+            cost, mana_produced = self.text.split('.',1)
         mana_dict = {"W": 0, "U": 0, "R": 0, "B": 0, "G": 0, "C":0, "Or": True, "Note": "", "cost":cost}
 
         # trova i simboli tra {}
@@ -398,7 +415,7 @@ class Card():
         QUANTITY = {"one":1, "two":2, "three":3, "four":4, "five":5, "X":"X"}
         quantity_match = re.search(r'Add (\w+) mana of any color', mana_produced)
         if quantity_match:
-            x = quality_match.group(1)
+            x = quantity_match.group(1)
             for symbol in "WURBG":
                 mana_dict[symbol] = QUANTITY[x]
         return  mana_dict
@@ -406,8 +423,12 @@ class Card():
     def abs_mana_production(self) ->int:
         HIGH = 10
         prod = self.get_mana_production()
+        if prod is None: return 0
         if 'for each' in prod['Note']: return HIGH
-
+        if prod['Or']:
+            return max([v for k,v in prod.items() if k in 'WURBGC'])
+        else:
+            return sum(v for k,v in prod.items() if k in 'WURBGC')
         
     
     def __len__(self) -> int :
