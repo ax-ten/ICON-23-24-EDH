@@ -93,7 +93,7 @@ class Filters(Enum):
 
         for type_member in SuperType:
             name = f'is{type_member.name}'  
-            value = lambda card, type_name = type_member.name: type_name in card.types
+            value = lambda card, type_name = type_member.name: type_name in card.super_types
             setattr(cls, name, value)
 
     @classmethod
