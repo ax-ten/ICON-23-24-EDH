@@ -40,7 +40,7 @@ class Grimoire():
 
     def __repr__(self) -> str:
         s = ''
-        for card, deckids in self.items():
+        for card in self.keys():
             s= s + f'{card}\n'
         return s
     
@@ -76,11 +76,35 @@ class Grimoire():
         return (deck_aggregates.keys(), np.unique(deck_aggregates.values()))
     
     from typing import Callable
-    def dataframe(self, filters: list[Callable[[Card], bool]] = None, additional_data=None):
+    def dataframe(self, 
+                positive_filters: list[Callable[[Card], bool]] = None, 
+                negative_filters: list[Callable[[Card], bool]] = None, 
+                additional_data=None):
         import pandas as pd
-        flattened_cards = [card.flatten(filters, additional_data) for card in self]
+        flattened_cards = [card.flatten(positive_filters, negative_filters, additional_data) for card in self]
         df = pd.concat([pd.DataFrame(card) for card in flattened_cards], ignore_index=True)
         return df
+    
+
+    def vectorize(self, do_types=True, do_subtypes=False, do_keywords=False):
+        from collections import Counter as C
+        vector = {}
+        for card in self:
+            if do_types: vector = C(vector) + C(count(self, card.types))
+            if do_subtypes:  vector = C(vector) + C(count(self, card.sub_types))
+            if do_keywords:  vector = C(vector) + C(count(self, card.keywords))
+
+        return vector
+
+
+def count(grim:Grimoire, dict):
+    vector = {}
+    for type in dict:
+        vector[type] = 1
+    return vector
+
+        
+
 
 
 # Metodi Statici
