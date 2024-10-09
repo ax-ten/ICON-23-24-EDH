@@ -1,6 +1,6 @@
 import json, csv
-FILENAME = "oracle-cards-20241005090218.json"
-
+import os
+FILENAME = [f for f in os.listdir("./data/oracle_cards") if f.endswith(".json")][0]
 
 def read_cards(path = f"./data/oracle_cards/{FILENAME}")-> dict:#of dicts
     with open(path, "rb") as infile:

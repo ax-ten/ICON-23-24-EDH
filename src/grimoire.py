@@ -95,6 +95,23 @@ class Grimoire():
             if do_keywords:  vector = C(vector) + C(count(self, card.keywords))
 
         return vector
+    
+    def split(self) -> dict:
+        """_summary_
+        Returns:
+            grimoires (dict[int,Grimoire]): grimori separati per deck_id
+        """
+        all_deck_ids = set()
+        for deckids in grimoire.values():
+            all_deck_ids.update(deckids)
+
+        grimoires = {}
+        for deck_id in all_deck_ids:
+            grimoires[deck_id] = Grimoire()
+            for card, associated_deck_ids in grimoire.items():
+                if  deck_id in associated_deck_ids:
+                    grimoires[deck_id].append(card,deck_id)
+        return grimoires
 
 
 def count(grim:Grimoire, dict):
@@ -145,25 +162,6 @@ def load(filename:str, ask:bool=False, display:bool=True) -> Grimoire:
     #     return fetch(filename)
     return None
 
-
-def split(grimoire:Grimoire) -> dict[int,Grimoire]:
-    """_summary_
-    Args:
-        grimoire (Grimoire): grimorio da dividere
-    Returns:
-        grimoires (dict[int,Grimoire]): grimori separati per deck_id
-    """
-    all_deck_ids = set()
-    for deckids in grimoire.values():
-        all_deck_ids.update(deckids)
-
-    grimoires = {}
-    for deck_id in all_deck_ids:
-        grimoires[deck_id] = Grimoire()
-        for card, associated_deck_ids in grimoire.items():
-            if  deck_id in associated_deck_ids:
-                grimoires[deck_id].append(card,deck_id)
-    return grimoires
 
 
 
@@ -262,7 +260,6 @@ def handle_cards(check_if_playable):
     while len(handled_decks) < len(decks_to_fetch):
         try:
             response, deck_id = queue.get(timeout=10)
-            print(response.json())
         except Empty:
             print("Non riesco ad aggiungere altre carte, procedo oltre                \n")
             break

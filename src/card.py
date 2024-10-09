@@ -367,7 +367,7 @@ class Card():
         }
         
 
-        if Filters.isCreature in filters:
+        if Filters.isCreature in positive_filters:
             flat = { **flat,
                 **{"toughness": [self.toughness]},
                 **{"power": [self.power]}
