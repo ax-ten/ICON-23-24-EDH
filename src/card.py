@@ -456,7 +456,7 @@ def legalities(csv_line):
     return json.loads(csv_line[11].replace( "'",'"').lower())
 
 supertypes_mapping = {'': 0, 'Token':1, 'Basic':2, 'Legendary':3}  
-rarity_mapping = {'':0, 'common':0, 'uncommon':1, 'rare':2, 'mythic':3, 'special':4, 'bonus':4}
+rarity_mapping = {'':0, 'common':0, 'uncommon':1, 'rare':2, 'mythic':3, 'special':1, 'bonus':1}
 def opt(dict, condition, result={}):
     return dict if condition else result
 
