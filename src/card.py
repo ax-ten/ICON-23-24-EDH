@@ -456,7 +456,7 @@ def legalities(csv_line):
     return json.loads(csv_line[11].replace( "'",'"').lower())
 
 supertypes_mapping = {'': 0, 'Token':1, 'Basic':2, 'Legendary':3}  
-rarity_mapping = {'':0, 'common':0, 'uncommon':1, 'rare':2, 'mythic':3, 'special':1, 'bonus':1}
+rarity_mapping = {'':0, 'common':0, 'uncommon':1, 'rare':2, 'mythic':3, 'special':4, 'bonus':4}
 def opt(dict, condition, result={}):
     return dict if condition else result
 
@@ -479,7 +479,7 @@ def text(keywords:list, t:str) -> str:
     #     i+=1
     # return t[i-1:].strip().replace("'", "''")
 
-def mana_value(mv:str) ->dict:
+def mana_value(mv:str) -> dict:
     mana_value = {color:mv.count(color)  for color in "WURBGC"}
     if len(mv)>0 and mv[1].isdigit():
         mana_value['C']+= int(mv[1])

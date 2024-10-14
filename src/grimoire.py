@@ -23,7 +23,7 @@ class Grimoire():
                 for row in reader:
                     card=Card()
                     card.load_csv(row)
-                    self.append(card,deck_id=0)
+                    self.append(card)
                     
                     # self.append(Card().load_csv(row),deck_id=0)
             
@@ -31,8 +31,8 @@ class Grimoire():
         else:
             self.cards = load(OMNI,display=False).cards
 
-    def __iter__(self):         return iter(self.cards)
-    def __len__(self):          return len(self.cards)
+    def __iter__(self)->list[Card]: return iter(self.cards)
+    def __len__(self)->list[Card]:  return len(self.cards)
     def __getitem__(self, key): return self.cards[key]
     def keys(self):             return self.cards.keys()
     def values(self):           return self.cards.values()
@@ -44,7 +44,7 @@ class Grimoire():
             s= s + f'{card}\n'
         return s
     
-    def append(self, card:Card, deck_id):
+    def append(self, card:Card, deck_id=0):
         if card not in self.keys():
             self.cards = {**self.cards, **{card:[deck_id]}}
         else:
@@ -59,14 +59,15 @@ class Grimoire():
 
     def all_subtypes(self) -> list:
         subtypes = set()
-        for card in self.keys():
+        for card in self:
+    
             subtypes.update(card.sub_types)
         return list(subtypes)
 
     def analyze(self, pooling:Pooling):
         subtypes = self.all_subtypes()  # ottieni tutti i sottotipi delle carte
         deck_aggregates = {}
-        deck_grimoires = split(self) # ottieni un dict[deck_id,grimoire]
+        deck_grimoires = self.split() # ottieni un dict[deck_id,grimoire]
         
         for deck_id, grimoire in deck_grimoires.items():
             card_vectors = [card.vectorize(subtypes) for card in grimoire]
@@ -86,27 +87,44 @@ class Grimoire():
         return df
     
 
-    def vectorize(self, do_types=True, do_subtypes=False, do_keywords=False):
-        from collections import Counter as C
-        vector = {}
-        total_len = 0
-        for card, ids in self.items():
-            freq = len(ids)
-            if do_types: vector = C(vector) + C(count(self, card.types, freq))
-            if do_subtypes:  vector = C(vector) + C(count(self, card.sub_types, freq))
-            if do_keywords:  vector = C(vector) + C(count(self, card.keywords, freq))
-            total_len += freq
+    def vectorize(self):
+        vector: dict[int, list[bool]] = {}
 
+        deck_ids = set(deck_id for deck_list in self.values() for deck_id in deck_list)
+        for deck_id in deck_ids:
+            vector[deck_id] = [0] * len(self)
+
+        for i, card in enumerate(self):
+            for deck_id in self[card]:
+                vector[deck_id][i] = 1
+        
         return vector
+
+    # def vectorize(self, do_types=True, do_subtypes=False, do_keywords=False):
+    #     from collections import Counter as C
+    #     vector = {}
+    #     total_len = 0
+    #     for card, ids in self.items():
+    #         freq = len(ids)
+    #         if do_types: vector = C(vector) + C(count(self, card.types, freq))
+    #         if do_subtypes:  vector = C(vector) + C(count(self, card.sub_types, freq))
+    #         if do_keywords:  vector = C(vector) + C(count(self, card.keywords, freq))
+    #         total_len += freq
+
+    #     return vector
+
+    def similarity_matrix(self):
+        if len(self.split()) == 1:
+            raise ValueError
+        return similarity_matrix(self.split())
+
     
     def split(self) -> dict:
         """_summary_
         Returns:
             grimoires (dict[int,Grimoire]): grimori separati per deck_id
         """
-        all_deck_ids = set()
-        for deckids in grimoire.values():
-            all_deck_ids.update(deckids)
+        all_deck_ids = set(deck_id for deck_list in self.values() for deck_id in deck_list)
 
         grimoires = {}
         for deck_id in all_deck_ids:
@@ -123,7 +141,8 @@ def count(grim:Grimoire, dict, freq):
         vector[type] = freq
     return vector
 
-        
+def cosine_similarity(self, grim:Grimoire)->float:
+    return cosine_similarity(self, grim)
 
 
 
@@ -321,3 +340,30 @@ def wait_valid_response(arg):
         response = requests.get(arg)
         time.sleep(0.4) # per non sovraccaricare la API
     return response
+
+
+def cosine_similarity(grim1:Grimoire, grim2:Grimoire) -> float:
+    v1 = grim1.vectorize()
+    v2 = grim2.vectorize()
+    
+    dot_product = np.dot(v1, v2)
+    
+    norm1 = np.linalg.norm(v1)
+    norm2 = np.linalg.norm(v2)
+    
+    if norm1 == 0 or norm2 == 0:
+        return 0.000001
+    
+    return dot_product / (norm1 * norm2)
+
+def similarity_matrix(grims:dict[str:Grimoire]) -> np.ndarray:
+    n = len(grims)
+    grims = list(grims.values())
+    matrix = np.zeros((n,n))
+
+    for i in range(n):
+        for j in range(i, n):
+            sim = cosine_similarity(grims[i], grims[j])
+            matrix[i][j] = matrix[j][i]  = sim
+            
+    return matrix
