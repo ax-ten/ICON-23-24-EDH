@@ -34,6 +34,8 @@ class Grimoire():
     def __iter__(self)->list[Card]: return iter(self.cards)
     def __len__(self)->list[Card]:  return len(self.cards)
     def __getitem__(self, key): return self.cards[key]
+    def __delitem__(self, card): del self.cards[card]
+    def __contains__(self, card): return card in self.cards
     def keys(self):             return self.cards.keys()
     def values(self):           return self.cards.values()
     def items(self):            return self.cards.items()
@@ -44,13 +46,13 @@ class Grimoire():
             s= s + f'{card}\n'
         return s
     
-    def append(self, card:Card, deck_id=0):
-        if card not in self.keys():
-            self.cards = {**self.cards, **{card:[deck_id]}}
+    def append(self, card: Card, deck_id: str | list[str]):
+        if isinstance(deck_id, list):
+            self.cards.setdefault(card, []).extend(deck_id)
         else:
-            self.cards[card].append(deck_id)
+            self.cards.setdefault(card, []).append(deck_id)
     
-    def save(self, filename:str):
+    def save(self, filename:str) -> str:
         filename = filename.translate(filename_translator)
         grimoire_path = rf"{PATH}{filename.replace('?','-')}.pkl"
         with open(grimoire_path, "wb") as outfile:
@@ -87,10 +89,10 @@ class Grimoire():
         return df
     
 
-    def vectorize(self):
+    def vectorize(self) -> dict[int, list[bool]]:
         vector: dict[int, list[bool]] = {}
 
-        deck_ids = set(deck_id for deck_list in self.values() for deck_id in deck_list)
+        deck_ids = [deck_id for deck_list in self.values() for deck_id in deck_list]
         for deck_id in deck_ids:
             vector[deck_id] = [0] * len(self)
 
@@ -113,7 +115,7 @@ class Grimoire():
 
     #     return vector
 
-    def similarity_matrix(self):
+    def similarity_matrix(self) -> np.ndarray:
         if len(self.split()) == 1:
             raise ValueError
         return similarity_matrix(self.split())
@@ -124,15 +126,40 @@ class Grimoire():
         Returns:
             grimoires (dict[int,Grimoire]): grimori separati per deck_id
         """
-        all_deck_ids = set(deck_id for deck_list in self.values() for deck_id in deck_list)
 
         grimoires = {}
-        for deck_id in all_deck_ids:
+        for deck_id in self.get_all_deck_ids():
             grimoires[deck_id] = Grimoire()
             for card, associated_deck_ids in grimoire.items():
                 if  deck_id in associated_deck_ids:
                     grimoires[deck_id].append(card,deck_id)
         return grimoires
+
+    def get_all_deck_ids(self) -> set:
+        return set(deck_id for deck_list in self.values() for deck_id in deck_list)
+    
+    def extract(self, deck_id:str) -> 'Grimoire':
+        g = Grimoire()
+        for card, deckids in self.items():
+            if deck_id in deckids:
+                g.append(card, deck_id)
+        return g
+    
+    def remove(self, deck_id:str) -> bool:
+        """
+        summary: cancella da tutte le carte di un grimorio un deck_id, 
+        poi rimuove carte senza deck_id
+        """
+        removed = False
+        for card in list(self):
+            if deck_id in self[card]:
+                self[card].remove(deck_id)
+                removed = True
+            
+            if not self[card]:
+                del self[card]
+
+        return removed
 
 
 def count(grim:Grimoire, dict, freq):
@@ -148,11 +175,9 @@ def cosine_similarity(self, grim:Grimoire)->float:
 
 # Metodi Statici
 def merge(g_A:Grimoire, g_B:Grimoire):
-    grim = g_A
     for card, deck_ids in g_B.items():
-        for deck_id in deck_ids:
-            grim.append(card, deck_id)
-    return grim
+        g_A.append(card, deck_ids)
+    return g_A
 
 
 def load(filename:str, ask:bool=False, display:bool=True) -> Grimoire:
@@ -343,16 +368,23 @@ def wait_valid_response(arg):
 
 
 def cosine_similarity(grim1:Grimoire, grim2:Grimoire) -> float:
-    v1 = grim1.vectorize()
-    v2 = grim2.vectorize()
-    
+    ## Unisci i grimori
+    g = merge(grim1,grim2)
+    #vettorizzali e scarta i deck_id
+    # se sono più di due darà errore
+
+    vectors = list(g.vectorize().values()) #[:2]
+    if len(vectors) == 1:
+        return 1.0
+
+    v1, v2 = vectors[:2]
     dot_product = np.dot(v1, v2)
     
     norm1 = np.linalg.norm(v1)
     norm2 = np.linalg.norm(v2)
     
-    if norm1 == 0 or norm2 == 0:
-        return 0.000001
+    if 0 in [norm1,norm2]:
+        return 0.0
     
     return dot_product / (norm1 * norm2)
 
