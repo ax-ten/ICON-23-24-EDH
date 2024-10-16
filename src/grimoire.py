@@ -89,8 +89,11 @@ class Grimoire():
         return df
     
 
-    def vectorize(self) -> dict[int, list[bool]]:
-        vector: dict[int, list[bool]] = {}
+    def vectorize(self) -> dict[str, list[bool]]:
+        """
+        Restituisce un dict di vettori booleani (0 o 1) di lunghezza pari a quella del grimorio
+        """
+        vector: dict[str, list[bool]] = {}
 
         deck_ids = [deck_id for deck_list in self.values() for deck_id in deck_list]
         for deck_id in deck_ids:
@@ -105,7 +108,7 @@ class Grimoire():
     # def vectorize(self, do_types=True, do_subtypes=False, do_keywords=False):
     #     from collections import Counter as C
     #     vector = {}
-    #     total_len = 0
+    #     total_len = 0017
     #     for card, ids in self.items():
     #         freq = len(ids)
     #         if do_types: vector = C(vector) + C(count(self, card.types, freq))
@@ -118,7 +121,7 @@ class Grimoire():
     def similarity_matrix(self) -> np.ndarray:
         if len(self.split()) == 1:
             raise ValueError
-        return similarity_matrix(self.split())
+        return similarity_matrix(self)
 
     
     def split(self) -> dict:
@@ -388,9 +391,10 @@ def cosine_similarity(grim1:Grimoire, grim2:Grimoire) -> float:
     
     return dot_product / (norm1 * norm2)
 
-def similarity_matrix(grims:dict[str:Grimoire]) -> np.ndarray:
+def similarity_matrix(splittable_grims:Grimoire) -> np.ndarray:
+    
+    grims = list(splittable_grims.split().values())
     n = len(grims)
-    grims = list(grims.values())
     matrix = np.zeros((n,n))
 
     for i in range(n):
