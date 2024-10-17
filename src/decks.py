@@ -83,14 +83,9 @@ def save(decks, filename, by:By, ask=False) -> str:
 from src.by import By
 def load(filename:str, by:By=None):
     filename = filename.translate(filename_translator)
-    PATHS = [rf'{"./data/fetched/"}{by.value}/{filename}.pkl' for by in By]
-    if by is not None:
-        path = f'{"./data/fetched/"}{by.value}/{filename}.pkl'
-        if os.path.exists(path):
-            with open(path, "rb") as infile:
-                return pickle.load(infile)
+    paths = [f'./data/fetched/{(by or b).value}/{filename}.pkl' for b in By]
     
-    for path in PATHS:
+    for path in paths:
         if os.path.exists(path):
             with open(path, "rb") as infile:
                 return pickle.load(infile)
@@ -163,7 +158,7 @@ def fetch(by:By, query_arg:str, n_thread=3, do_load=True, do_save=True, upper_li
         t.start()
         
     for t in threads:
-        t.join()
+        t.join(timeout=5)
 
     if do_save and deck_count>0:
         file_dim = save(decks,query_arg,by)
