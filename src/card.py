@@ -129,31 +129,13 @@ class Card():
     default_category : list[str]                # []
     legalities : dict[str:bool]
 
-    LOAD_MAPPING = {
-        'oracle_id':    ([0, 'id'],         None),
-        'name':         ([1, 'name'],       None),
-        'rarity':       ([16, 'rarity'],    None),
-        'power':        ([26, 'power'],     pot),
-        'toughness':    ([27, 'toughness'], pot),
-        'keywords':     ([10, 'keywords'],  keywords),
-        'text':         ([7, 'text'],       lambda v: text(keywords(v), v)),  
-        'super_types':  ([6, 'superTypes'], lambda v: split_typeline(v)[0]),
-        'types':        ([6, 'types'],      lambda v: split_typeline(v)[1]),
-        'sub_types':    ([6, 'subTypes'],   lambda v: split_typeline(v)[2]),
-        'mana_value':   ([4, 'manaCost'],   mana_value),
-        'colors':       ([8, 'colors'],     colors),
-        'color_identity':([9,'colorIdentity'], colors),
-        'mana_cost':    ([5, 'cmc'],        int),  
-        'set':          ([12, 'set'],       None),  
-        'legalities':   ([None,'legalities'], legalities),  
-        'mana_production': ([None, 'manaProduction'], None),  
-        'default_category': ([None, 'defaultCategory'], None),
-    }
+
 
     def __repr__(self) -> str:     return f"{self.name}"
     def __eq__(self,other):        return self.oracle_id == other.oracle_id
     def __hash__(self):        return hash(self.oracle_id)
-    def __init__(self) -> None:        pass
+    def __init__(self) -> None: pass
+
 
     def load(self, source:dict|csv.DictReader):
         """
@@ -188,12 +170,13 @@ class Card():
         if    isinstance(source, dict):           k = 1
         elif  isinstance(source, csv.DictReader): k = 0
         else: raise ValueError("source deve essere di tipo dict o csv.DictReader")
-        
+
         for attribute,  (keys, transform) in self.LOAD_MAPPING.items():
-            value = source[keys[k]]            
+            value = source[keys[k]] if keys[k] in source else source['oracleCard'][keys[k]]
             if transform:
                 value = transform(value)
             setattr(self, attribute, value)
+
 
         return self
 
@@ -330,16 +313,31 @@ class Card():
 
         return card_vector
     
-
-
     def line(self, predicate, values=None):
         name = self.name.replace("'","''").replace('//', '')
         line = f"{predicate}('{name}'"
         if values is not None:
-            line += ','.join(f"'{value.replace('\'', '\'\'').replace('//', '-').replace('!', '')}'" 
-                for value in values if isinstance(value, str))
-
+            for value in values:
+                if isinstance(value,str):
+                    if "'" in value:
+                        value = value.replace("'","''")
+                    if '//' in value:
+                        value = value.replace('//', '-')
+                    if "!" in value:
+                        value = value.replace("!","")
+                
+                    value = f"'{value}'"
+                line += f',{value}'
         return line+')'
+
+    # def line(self, predicate, values=None):
+    #     name = self.name.replace("'","''").replace('//', '')
+    #     line = f"{predicate}('{name}'"
+    #     if values is not None:
+    #         line += ','.join(f"'{value.replace('\'', '\'\'').replace('//', '-').replace('!', '')}'" 
+    #             for value in values if isinstance(value, str))
+
+    #     return line+')'
 
     fact_mapping = {
         'mana_cost':      lambda o, v: o.line('cost', [v]),
@@ -575,25 +573,109 @@ class Card():
 
     def is_legal(self, format:Format=Format.commander) -> bool:
         return self.legalities[format.name]
+
+
+    @staticmethod
+    def _pot(pot:str)-> int:
+        if pot is None or pot == '': return 0
+        if not pot[0].isdigit(): return 0
+        if '*' in pot: 
+            pot = pot.replace('*', '0').replace('+', '')
+        try:
+            return int(pot)
+        except:
+            return 0
+
+    @staticmethod 
+    def _keywords(kw:str) -> list:
+        return kw[1:-1].replace("'", '').replace(" ", '').split(',')
+    
+    @staticmethod
+    def _text(t:str, keywords:list=None) -> str:
+        return t.strip().replace("'", "''")
+    #   si è rivelato troppo complicato, abort
+        # if len(keywords) == 1:
+        #     return t.strip().replace("'", "''")
+        # caps = 0
+        # i=0
+        # while caps<len(keywords)+1 and len(t)>i:
+        #     if t[i].isupper():
+        #         caps +=1
+        #     i+=1
+        # return t[i-1:].strip().replace("'", "''")
+
+    @staticmethod
+    def _mana_value(mv:str) -> dict:
+        mana_value = {color:mv.count(color)  for color in "WURBGC"}
+        if len(mv)>0 and mv[1].isdigit():
+            mana_value['C']+= int(mv[1])
+        return mana_value
+
+
+    @staticmethod
+    def _colors(ci:list) -> dict:
+        translator = {'W':'White','U':'Blue','B':'Black','R':'Red','G':'Green'}
+        return {k: k in ci for k,v in translator.items()}
     
 
-    def pot(pot:str) ->int:
-        return pot(str)
+    # def _split_typeline(typeline:str) -> tuple: 
+    #     supertypes = [type.name for type in SuperType if type.name in typeline]
+    #     types = [type.name for type in Type if type.name in typeline]
 
+        
+    #     return (supertypes, types, subtypes)
 
-def pot(pot:str)-> int:
-    if pot is None or pot == '': return 0
-    if not pot[0].isdigit(): return 0
-    if '*' in pot: 
-        pot = pot.replace('*', '0').replace('+', '')
-    try:
-        return int(pot)
-    except:
-        return 0
+    def _types(typeline:str) -> list[str]:
+        return [type.name for type in Type if type.name in typeline]
 
-def legalities(csv_line):
-    import json
-    return json.loads(csv_line[11].replace( "'",'"').lower())
+    def _supertypes(typeline:str) -> list[str]:
+        return [type.name for type in SuperType if type.name in typeline]
+
+    def _subtypes(typeline:str|list) -> list[str]:
+        if isinstance(typeline, list):
+            return typeline
+        if '—' in typeline:
+            return typeline.split('—')[1].strip().split()
+        return []
+        # if Type.Plane.name in _types(typeline) and Type.Planeswalker.name not in types:
+        #     subtypes = [typeline.split('—')[1][1:]]
+        # else:
+        #     try:
+        #         subtypes = typeline.split('//')[1].split(" ")[1:]
+        #     except:
+        #         try:
+        #             subtypes = typeline.split('—')[1].split(" ")[1:]
+        #         except:
+        #             subtypes = []
+        # return subtypes
+
+    @staticmethod
+    def _legalities(line:str|list)->dict:
+        if isinstance(line, dict):
+            return line
+        import json
+        return json.loads(line[11].replace( "'",'"').lower())
+        
+    LOAD_MAPPING = {
+        'oracle_id':    ([0, 'id'],         None),
+        'name':         ([1, 'name'],       None),
+        'rarity':       ([16, 'rarity'],    None),
+        'power':        ([26, 'power'],     _pot),
+        'toughness':    ([27, 'toughness'], _pot),
+        'keywords':     ([10, 'text'],      _keywords),
+        'text':         ([7, 'text'],       _text),  
+        'super_types':  ([6, 'superTypes'], _supertypes),
+        'types':        ([6, 'types'],      _types),
+        'sub_types':    ([6, 'subTypes'],   _subtypes),
+        'mana_value':   ([4, 'manaCost'],   _mana_value),
+        'colors':       ([8, 'colors'],     _colors),
+        'color_identity':([9,'colorIdentity'], _colors),
+        'mana_cost':    ([5, 'cmc'],        int),  
+        # 'set':          ([12, 'set'],       None),  
+        'legalities':   ([None,'legalities'], _legalities),  
+        'mana_production': ([None, 'manaProduction'], None),  
+        'default_category': ([None, 'defaultCategory'], None),
+    }
 
 supertypes_mapping = {'': 0, 'Token':1, 'Basic':2, 'Legendary':3}  
 rarity_mapping = {'':0, 'common':0, 'uncommon':1, 'rare':2, 'mythic':3, 'special':4, 'bonus':4}
@@ -602,52 +684,6 @@ def opt(dict, condition, result={}):
 
 def vld(dict:dict, alt={}):
     return opt(dict, list(dict.values())[0] is not None and  list(dict.values())[0] != '', {list(dict.keys())[0]:0})
-
-def keywords(kw:str) -> list:
-    return kw[1:-1].replace("'", '').replace(" ", '').split(',')
-
-def text(keywords:list, t:str) -> str:
-    return t.strip().replace("'", "''")
-#   si è rivelato troppo complicato, abort
-    # if len(keywords) == 1:
-    #     return t.strip().replace("'", "''")
-    # caps = 0
-    # i=0
-    # while caps<len(keywords)+1 and len(t)>i:
-    #     if t[i].isupper():
-    #         caps +=1
-    #     i+=1
-    # return t[i-1:].strip().replace("'", "''")
-
-def mana_value(mv:str) -> dict:
-    mana_value = {color:mv.count(color)  for color in "WURBGC"}
-    if len(mv)>0 and mv[1].isdigit():
-        mana_value['C']+= int(mv[1])
-    return mana_value
-
-
-def colors(ci:list) -> dict:
-    translator = {'W':'White','U':'Blue','B':'Black','R':'Red','G':'Green'}
-    return {k: k in ci for k,v in translator.items()}
-
-
-def split_typeline(typeline:str) -> tuple: 
-    supertypes = [type.name for type in SuperType if type.name in typeline]
-    types = [type.name for type in Type if type.name in typeline]
-
-    if Type.Plane.name in types and Type.Planeswalker.name not in types:
-        subtypes = [typeline.split('—')[1][1:]]
-    else:
-        try:
-            subtypes = typeline.split('//')[1].split(" ")[1:]
-        except:
-            try:
-                subtypes = typeline.split('—')[1].split(" ")[1:]
-            except:
-                subtypes = []
-
-
-    return (supertypes, types, subtypes)
 
 
     

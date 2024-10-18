@@ -64,24 +64,27 @@ class Grimoire():
 
     def append(self, card: Card, deck_id: str | list[str]):
         """
-        Adds a deck ID or a list of deck IDs associated with a given card to the `cards` dictionary.
+    Adds a deck ID or a list of deck IDs associated with a given card to the `cards` dictionary.
 
-        This method appends a deck ID (or multiple deck IDs) to the list of deck IDs for the provided `card` 
-        in the `cards` dictionary. If the card is not already present in the dictionary, it creates a new entry.
+    This method appends a deck ID (or multiple deck IDs) to the list of deck IDs for the provided `card` 
+    in the `cards` dictionary. If the card is not already present in the dictionary, it creates a new entry.
+    
+    Args:
+        card (Card): The card object for which the deck ID(s) will be appended.
+        deck_id (str | int | list[str | int]): A single deck ID (str or int) or a list of deck IDs (list of str or int).
 
-        Args:
-            card (Card): The card object for which the deck ID(s) will be appended.
-            deck_id (str | list[str]): A single deck ID (str) or a list of deck IDs (list[str]) to be associated 
-            with the card.
+    Example:
+        card_manager.append(some_card, "deck_123")  # Adds deck_123 to the card's entry.
+        card_manager.append(some_card, ["deck_123", "deck_456"])  # Adds both deck IDs to the card's entry.
+        card_manager.append(some_card, 12345)  # Adds an integer deck ID.
+    """
+        if card not in self.cards:
+            self.cards[card] = []
 
-        Example:
-            card_manager.append(some_card, "deck_123")  # Adds deck_123 to the card's entry.
-            card_manager.append(some_card, ["deck_123", "deck_456"])  # Adds both deck IDs to the card's entry.
-        """
-        if isinstance(deck_id, list):
-            self.cards.setdefault(card, []).extend(deck_id)
-        else:
-            self.cards.setdefault(card, []).append(deck_id)
+        if isinstance(deck_id, (str, int)):
+            deck_id = [deck_id]
+
+        self.cards[card].extend(deck_id)
     
 
     def save(self, filename:str) -> str:
@@ -260,8 +263,7 @@ class Grimoire():
         """
         g = Grimoire()
         for card, deckids in self.items():
-            if deck_id in deckids:
-                g.append(card, deck_id)
+            g.append(card,deckids)
         return g
     
 
@@ -374,7 +376,7 @@ def load(filename:str, ask:bool=False, display:bool=True) -> Grimoire:
 ####################################
 
 from queue import Queue
-from threading import Thread, Lock
+from threading import Thread
 import time, requests
 import src.decks as decks
 from src.decks import Deck
@@ -402,7 +404,7 @@ def fetch(by:By, decks_filename:str, margin:int=0, n_thread:int=5, do_load:bool=
     Example:
         >>> fetch(By.COMMANDER, 'kodama', margin=10)
     """
-    global queue, deck_num, errori, grimoire, decks_to_fetch, seen, lock
+    global queue, deck_num, errori, grimoire, decks_to_fetch, seen
     
     if do_load:
         grimoire= load(decks_filename)
@@ -412,13 +414,12 @@ def fetch(by:By, decks_filename:str, margin:int=0, n_thread:int=5, do_load:bool=
     deck_num = 0
     errori = 0
     grimoire = Grimoire()
-    seen = []
+    seen = set()
     decks_to_fetch = decks.load(decks_filename)
     print(f'trovati {len(decks_to_fetch)} mazzi da fetchare per {decks_filename}')
     
     # Threads di richiesta e gestione
     queue = Queue()
-    lock = Lock()
     threads = [Thread(target=fetch_cards, args=(decks_to_fetch,)) for _ in range(n_thread)]
     handle_thread = Thread(target=handle_cards, args=(margin,))
     
@@ -514,7 +515,7 @@ def handle_cards(margin):
 
         #Per ogni carta nella risposta GET
         for card_dict in cards:
-            card = Card().load_dict(card_dict['card'])
+            card = Card().load(card_dict['card'])
             grimoire.append(card,deck_id)
             
             if card_dict['categories'] is not None and 'Commander' in card_dict['categories']:
@@ -542,14 +543,13 @@ def fetch_cards(decks_to_fetch:list):
     Args:
         decks_to_fetch (list): List of deck objects to fetch cards for.
     """
-    global seen, lock
+    global seen
     try:
         for deck in decks_to_fetch:
             # Permette di condividere la lista di mazzi tra più thread
-            with lock:
-                if deck.id in seen:
-                    continue
-                seen.append(deck.id)
+            if deck.id in seen:
+                continue
+            seen.add(deck.id)
             response = wait_valid_response(cards_url(deck.id))
             
             queue.put((response, deck.id))
@@ -618,13 +618,12 @@ def cosine_similarity(grim1:Grimoire, grim2:Grimoire) -> float:
 
     v1, v2 = vectors[:2]
     dot_product = np.dot(v1, v2)
-    
     n1, n2 = [np.linalg.norm(n) for n in [v1,v2]]
     
     if 0 in [n1,n2]:
         return 0.0
     
-    return dot_product / (n1 * n2)
+    return max(-1.0, min(1.0, dot_product / (n1 * n2)))
 
 def similarity_matrix(splittable_grims:Grimoire) -> np.ndarray:
     """
