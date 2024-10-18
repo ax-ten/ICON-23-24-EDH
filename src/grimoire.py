@@ -29,26 +29,55 @@ class Grimoire():
         return s
     
     def make_omni(self):
-        OMNI = 'OMNI'
-        if load(OMNI) is None:
+        """
+        Creates and loads the 'OMNI' dataset containing all available Magic: The Gathering cards.
+
+        This method checks if the 'OMNI' dataset has already been loaded. If not, it reads the `oracle_cards.csv` file
+        to load card data, creates `Card` objects for each entry, and appends them to the current object. Once all cards
+        are loaded, it saves the dataset for future use. If the 'OMNI' dataset is already available, it loads the 
+        existing data instead of recreating it.
+
+        Returns:
+            self: The current instance with the loaded card data.
+
+        Raises:
+            FileNotFoundError: If the `oracle_cards.csv` file cannot be found or opened.
+
+        Example:
+            omni = Grimoire().make_omni()
+        """
+        if load('OMNI') is None:
             CSV_PATH = "./data/oracle_cards/oracle_cards.csv"
     
             with open(CSV_PATH, 'r',encoding="UTF-8", errors="ignore") as infile:
                 reader = csv.reader(infile,delimiter=',')
                 head = next(reader)
                 for row in reader:
-                    card=Card()
-                    card.load_csv(row)
+                    card = Card().load(row)
                     self.append(card)
-                    
-                    # self.append(Card().load_csv(row),deck_id=0)
             
-            self.save(OMNI)
+            self.save('OMNI')
         else:
-            self.cards = load(OMNI,display=False).cards
+            self.cards = load('OMNI',display=False).cards
+        return self
     
 
     def append(self, card: Card, deck_id: str | list[str]):
+        """
+        Adds a deck ID or a list of deck IDs associated with a given card to the `cards` dictionary.
+
+        This method appends a deck ID (or multiple deck IDs) to the list of deck IDs for the provided `card` 
+        in the `cards` dictionary. If the card is not already present in the dictionary, it creates a new entry.
+
+        Args:
+            card (Card): The card object for which the deck ID(s) will be appended.
+            deck_id (str | list[str]): A single deck ID (str) or a list of deck IDs (list[str]) to be associated 
+            with the card.
+
+        Example:
+            card_manager.append(some_card, "deck_123")  # Adds deck_123 to the card's entry.
+            card_manager.append(some_card, ["deck_123", "deck_456"])  # Adds both deck IDs to the card's entry.
+        """
         if isinstance(deck_id, list):
             self.cards.setdefault(card, []).extend(deck_id)
         else:
@@ -56,6 +85,23 @@ class Grimoire():
     
 
     def save(self, filename:str) -> str:
+        """
+        Saves the current object to a pickle file with the given filename.
+
+        This method serializes the current object and stores it as a `.pkl` file in the specified path.
+        The filename is cleaned up by replacing certain characters (like `?`), and the file size is returned in kilobytes.
+
+        Args:
+            filename (str): The name of the file where the object will be saved. 
+                            Special characters are translated based on `filename_translator`.
+
+        Returns:
+            str: The size of the saved file in kilobytes (rounded to two decimal places).
+
+        Example:
+            file_size_kb = grimoire.save("my_grimoire_file")  
+            # Saves the current object as "my_grimoire_file.pkl" and returns the file size.
+        """
         filename = filename.translate(filename_translator)
         grimoire_path = rf"{PATH}{filename.replace('?','-')}.pkl"
         with open(grimoire_path, "wb") as outfile:
@@ -72,6 +118,24 @@ class Grimoire():
 
 
     def analyze(self, pooling:Pooling):
+        """
+        Analyzes the cards in the grimoire and aggregates their data by deck.
+
+        This function splits the grimoire into individual decks and converts the cards in each deck into vectors. 
+        These vectors are then pooled together using the provided pooling function (e.g., mean, sum) to create a single aggregated vector for each deck.
+        Finally, it returns the deck IDs and unique aggregated vectors.
+
+        Args:
+            pooling (Pooling): A function used to aggregate the card vectors in each deck (e.g., averaging the vectors).
+
+        Returns:
+            tuple: A tuple containing:
+                - A list of deck IDs (keys of `deck_aggregates`).
+                - A NumPy array of unique aggregated vectors for all decks.
+
+        Example:
+            deck_ids, unique_vectors = grimoire.analyze(mean_pooling_function)
+        """
         subtypes = self.all_subtypes()  # ottieni tutti i sottotipi delle carte
         deck_aggregates = {}
         deck_grimoires = self.split() # ottieni un dict[deck_id,grimoire]
@@ -89,6 +153,30 @@ class Grimoire():
                 positive_filters: list[Callable[[Card], bool]] = None, 
                 negative_filters: list[Callable[[Card], bool]] = None, 
                 additional_data=None):
+        """
+        Creates a pandas DataFrame from the cards in the current object, applying optional filters.
+
+        This method flattens each card in the current object using the provided positive and negative filters,
+        and then concatenates the resulting data into a single pandas DataFrame. 
+        Positive filters are functions that determine whether a card meets certain criteria, while negative filters
+        are used to exclude cards that do not meet specified conditions. 
+
+        Args:
+            `positive_filters (list[Callable[[Card], bool]], optional)`: A list of functions that return True for 
+            cards that should be included in the DataFrame.
+            
+            `negative_filters (list[Callable[[Card], bool]], optional)`: A list of functions that return True for 
+            cards that should be excluded from the DataFrame.
+            
+            `additional_data (optional)`: Any extra data to be included in the flattening process of the cards.
+
+        Returns:
+            `pd.DataFrame`: A pandas DataFrame containing the flattened data of the cards after applying filters.
+
+        Example:
+            df = grimoire.dataframe(positive_filters=[Filters.isLegalInCommander], negative_filters=[Filters.isColorless])
+            # Creates a DataFrame of playable cards that are not banned.
+        """
         import pandas as pd
         flattened_cards = [card.flatten(positive_filters, negative_filters, additional_data) for card in self]
         df = pd.concat([pd.DataFrame(card) for card in flattened_cards], ignore_index=True)
@@ -97,7 +185,19 @@ class Grimoire():
 
     def vectorize(self) -> dict[str, list[bool]]:
         """
-        Restituisce un dict di vettori booleani (0 o 1) di lunghezza pari a quella del grimorio
+        Creates a binary vector representation for each deck based on the cards it contains.
+
+        This method generates a dictionary where each `key` is a deck ID and the corresponding `value`
+        is a list of booleans indicating the presence (1) or absence (0) of each card in the current object. 
+        The length of the boolean list corresponds to the number of cards in the object.
+
+        Returns:
+            vector(dict[str, list[bool]]): A dictionary mapping deck IDs to their respective binary vectors.
+            Each vector has a length equal to the number of cards, with a 1 at index i indicating 
+            that the card at index i is included in the deck.
+
+        Example:
+            vector_representation = grimoire.vectorize()
         """
         vector: dict[str, list[bool]] = {}
 
@@ -120,8 +220,16 @@ class Grimoire():
 
     def split(self) -> dict:
         """
+        Splits the current collection of cards into separate Grimoires based on their associated deck IDs.
+
+        This method iterates over all deck IDs and creates a separate Grimoire for each deck,
+        appending the cards associated with that deck to the respective Grimoire.
+
         Returns:
-            list[Grimoire]: grimori separati per deck_id
+            dict(str, list[Grimoire]): A dictionary mapping each deck ID to its corresponding Grimoire object.
+
+        Example:
+            grimoires_by_deckid = grimoires.split()
         """
         grimoires = []
         for deck_id in self.get_all_deck_ids():
@@ -138,6 +246,18 @@ class Grimoire():
     
 
     def extract(self, deck_id:str) -> 'Grimoire':
+        """
+        Estrae un sottogruppo di carte associate a un dato deck_id.
+
+        Questa funzione crea un nuovo oggetto Grimoire contenente solo le carte 
+        associate a un determinato deck_id presente nel grimorio corrente.
+
+        Args:
+            deck_id (str): L'identificativo del mazzo di cui si desidera estrarre le carte.
+
+        Returns:
+            Grimoire: Un nuovo grimorio che contiene solo le carte associate al deck_id specificato.
+        """
         g = Grimoire()
         for card, deckids in self.items():
             if deck_id in deckids:
@@ -146,10 +266,22 @@ class Grimoire():
     
 
     def remove(self, deck_id:str) -> bool:
-        """_summary_ cancella da tutte le carte di un grimorio un deck_id, 
-        poi rimuove carte senza deck_id
+        """
+        Removes a specified deck ID from all cards in the Grimoire.
+
+        This method iterates through each card in the Grimoire and removes the provided 
+        deck ID from the list of associated deck IDs for that card. If a card no longer 
+        has any associated deck IDs after the removal, it will be deleted from the Grimoire.
+
+        Args:
+            deck_id (str): The ID of the deck to be removed from each card.
+
         Returns:
-            True se almeno un deck_id è stato rimosso
+            bool: True if at least one deck ID was removed from any card; False otherwise.
+        
+        Example:
+            success = grimoire.remove('deck123')
+        will remove 'deck123' from all cards in the Grimoire and return True if any removals occurred.
         """
         removed = False
         for card in list(self):
@@ -169,8 +301,25 @@ def cosine_similarity(self, grim:Grimoire)->float:
 
 # Metodi Statici
 def merge(g1:Grimoire, g2:Grimoire) -> Grimoire:
-    """Returns: 
-        Grimoire: unione di g1 e g2
+    """
+    Merges two Grimoires into a single Grimoire.
+
+    This function combines the contents of two Grimoire objects, g1 and g2. 
+    For each unique card in either Grimoire, it appends the card to the 
+    resulting Grimoire and associates it with all deck IDs from both 
+    g1 and g2.
+
+    Args:
+        g1 (Grimoire): The first Grimoire to merge.
+        g2 (Grimoire): The second Grimoire to merge.
+
+    Returns:
+        Grimoire: A new Grimoire containing the union of cards and their 
+        associated deck IDs from both g1 and g2.
+
+    Example:
+        merged_grimoire = merge(grimoire1, grimoire2)
+    This will create a new Grimoire containing all cards from both grimoire1 and grimoire2.
     """
     g = Grimoire()
     for card in {**g1, **g2}:
@@ -185,11 +334,24 @@ def merge(g1:Grimoire, g2:Grimoire) -> Grimoire:
 
 
 def load(filename:str, ask:bool=False, display:bool=True) -> Grimoire:
-    """_summary_
+    """
+    Loads a Grimoire from a specified file.
+
+    This function attempts to load a Grimoire object from a pickle file 
+    located in the specified path. The filename should not include the 
+    file extension.
+
     Args:
-        filename (str): nome del file, senza percorso, ne` estensione
+        filename (str): The name of the file, without the path or extension.
+        ask (bool, optional): If set to True, the user will be prompted before loading. Defaults to False.
+        display (bool, optional): If set to True, a message will be displayed when loading the Grimoire. Defaults to True.
+
     Returns:
-        Grimoire: il grimorio caricato
+        Grimoire: The loaded Grimoire object, or None if the file does not exist.
+
+    Example:
+        grimorio = load('Kodama of the West Tree')
+    This will load the Grimoire from '{PATH}/Kodama of the West Tree.pkl' if it exists.
     """
 
     filename = filename.translate(filename_translator)
@@ -220,20 +382,25 @@ from src.by import By
 
 def fetch(by:By, decks_filename:str, margin:int=0, n_thread:int=5, do_load:bool=True, do_save:bool=True):
     """
-    Ottiene tutte le carte da mazzi già salvati.
+    Fetches all cards from already saved decks.
+
+    This function retrieves cards from decks specified in the given filename. 
+    It can load existing decks, save the fetched cards, and allows for multithreaded 
+    fetching of cards from an API based on the specified search type.
+
     Args:
-        by (By): tipo di ricerca usata per il mazzo (per commander, per nome, ...)
-        decks_filename (str): nome del file mazzi
-        margin (int): se un mazzo ha un numero di carte entro 100 ± margin, è accettato
-        n_thread (int): thread applicati alle richieste API
-        do_load (bool): verifica se è già presente un file grimorio, nel caso carica da quello
-        do_save (bool): se True, salva il grimorio ottenuto
+        by (By): The type of search used for the deck (e.g., by commander, by name, etc.).
+        decks_filename (str): The name of the file containing the decks.
+        margin (int): Acceptable range for the number of cards in a deck (within ±margin of 100).
+        n_thread (int): The number of threads to be applied to API requests.
+        do_load (bool): If True, checks for an existing Grimoire file and loads it if present.
+        do_save (bool): If True, saves the fetched Grimoire to a file.
 
     Returns:
-        Grimoire: la raccolta di carte e i mazzi in cui sono presenti
+        Grimoire: A collection of cards and the decks in which they are present.
 
     Example:
-        >>>fetch(By.COMMANDER, 'kodama', margin=10)
+        >>> fetch(By.COMMANDER, 'kodama', margin=10)
     """
     global queue, deck_num, errori, grimoire, decks_to_fetch, seen, lock
     
@@ -316,6 +483,16 @@ def fetch(by:By, decks_filename:str, margin:int=0, n_thread:int=5, do_load:bool=
 
 # gestire le risposte
 def handle_cards(margin):
+    """
+    Handles the processing of cards fetched from the API.
+
+    This function retrieves cards for each deck from a queue and processes them,
+    adding valid cards to the global Grimoire. It checks the total card count against
+    a specified margin and handles sideboards.
+
+    Args:
+        margin (int): Acceptable range for the number of cards in a deck (within ±margin of 100).
+    """
     def sidesize(cards: list) -> int:
         return sum(1 for card in cards if isinstance(card.get('categories'), list) and any(cat in ['Sideboard', 'Maybeboard'] for cat in card.get('categories', [])))
     global grimoire, decks_to_fetch, seen
@@ -355,6 +532,16 @@ def handle_cards(margin):
 
 # effettuare richieste GET
 def fetch_cards(decks_to_fetch:list):
+    """
+    Fetches card data for a list of decks from the API.
+
+    This function iterates over a list of decks, retrieves their card data,
+    and puts the responses in a queue for further processing. It ensures
+    that each deck is only fetched once using a thread-safe approach.
+
+    Args:
+        decks_to_fetch (list): List of deck objects to fetch cards for.
+    """
     global seen, lock
     try:
         for deck in decks_to_fetch:
@@ -376,6 +563,23 @@ def cards_url(deck_id):
 
 
 def wait_valid_response(arg):
+    """
+    Waits for a valid HTTP response from a GET request.
+
+    This function continuously sends a GET request to the specified URL
+    until a successful response (status code 200) is received. It handles
+    rate limiting by waiting when a 429 status code is encountered.
+
+    Args:
+        arg (str): The URL to send the GET request to.
+
+    Returns:
+        Response: The valid response object from the GET request.
+
+    Increments:
+        errori (int): A global counter for tracking the number of errors 
+                    encountered during the requests.
+    """
     global errori
     response = requests.get(arg)
     while response.status_code != 200:
@@ -388,6 +592,23 @@ def wait_valid_response(arg):
 
 
 def cosine_similarity(grim1:Grimoire, grim2:Grimoire) -> float:
+    """
+    Calcola la similarità coseno tra due grimori.
+
+    Questa funzione unisce due oggetti Grimoire e calcola la similarità coseno 
+    tra i loro vettori. La similarità coseno misura l'angolo tra due vettori 
+    in uno spazio n-dimensionale, producendo un valore compreso tra -1 e 1, 
+    dove 1 indica che i vettori sono identici, 0 indica che sono ortogonali, 
+    e -1 indica che sono opposti.
+
+    Args:
+        grim1 (Grimoire): Il primo grimorio da confrontare.
+        grim2 (Grimoire): Il secondo grimorio da confrontare.
+
+    Returns:
+        float: Il valore di similarità coseno tra i due grimori. 
+                Se uno dei grimori è vuoto, restituisce 0.0.
+    """
     ## Unisci i grimori
     g = merge(grim1,grim2)
 
@@ -406,7 +627,20 @@ def cosine_similarity(grim1:Grimoire, grim2:Grimoire) -> float:
     return dot_product / (n1 * n2)
 
 def similarity_matrix(splittable_grims:Grimoire) -> np.ndarray:
-    
+    """
+    Calcola una matrice di similarità coseno tra i grimori contenuti in un oggetto Grimoire.
+
+    Questa funzione suddivide un grimorio in più grimori, calcola la similarità coseno 
+    tra ogni coppia di grimori e restituisce una matrice quadrata che rappresenta 
+    le similarità tra tutti i grimori.
+
+    Args:
+        splittable_grims (Grimoire): Il grimorio da suddividere e analizzare.
+
+    Returns:
+        np.ndarray: Una matrice di similarità coseno, dove l'elemento (i, j) 
+                    rappresenta la similarità tra l'i-esimo il j-esimo grimorio .
+    """
     grims = splittable_grims.split()
     n = len(grims)
     matrix = np.zeros((n,n))
