@@ -591,62 +591,66 @@ def wait_valid_response(arg):
     return response
 
 
-def cosine_similarity(grim1:Grimoire, grim2:Grimoire) -> float:
+
+
+from src.similarity import SimilarityMethod
+def precompute_vectors(splittable_grims:Grimoire) -> np.ndarray:
     """
-    Calcola la similarità coseno tra due grimori.
-
-    Questa funzione unisce due oggetti Grimoire e calcola la similarità coseno 
-    tra i loro vettori. La similarità coseno misura l'angolo tra due vettori 
-    in uno spazio n-dimensionale, producendo un valore compreso tra -1 e 1, 
-    dove 1 indica che i vettori sono identici, 0 indica che sono ortogonali, 
-    e -1 indica che sono opposti.
-
-    Args:
-        grim1 (Grimoire): Il primo grimorio da confrontare.
-        grim2 (Grimoire): Il secondo grimorio da confrontare.
-
-    Returns:
-        float: Il valore di similarità coseno tra i due grimori. 
-                Se uno dei grimori è vuoto, restituisce 0.0.
-    """
-    ## Unisci i grimori
-    g = merge(grim1,grim2)
-
-    vectors = list(g.vectorize().values()) #[:2]
-    if len(vectors) == 1:
-        return 1.0
-
-    v1, v2 = vectors[:2]
-    dot_product = np.dot(v1, v2)
-    n1, n2 = [np.linalg.norm(n) for n in [v1,v2]]
-    
-    if 0 in [n1,n2]:
-        return 0.0
-    
-    return max(-1.0, min(1.0, dot_product / (n1 * n2)))
-
-def similarity_matrix(splittable_grims:Grimoire) -> np.ndarray:
-    """
-    Calcola una matrice di similarità coseno tra i grimori contenuti in un oggetto Grimoire.
-
-    Questa funzione suddivide un grimorio in più grimori, calcola la similarità coseno 
-    tra ogni coppia di grimori e restituisce una matrice quadrata che rappresenta 
-    le similarità tra tutti i grimori.
+    Precalcola i vettori risultanti dal merge di ogni coppia di grimori.
 
     Args:
         splittable_grims (Grimoire): Il grimorio da suddividere e analizzare.
 
     Returns:
-        np.ndarray: Una matrice di similarità coseno, dove l'elemento (i, j) 
-                    rappresenta la similarità tra l'i-esimo il j-esimo grimorio .
+        np.ndarray: Una matrice di vettori, dove ogni cella (i, j) contiene i vettori
+                    risultanti dal merge tra l'i-esimo e il j-esimo grimorio.
     """
     grims = splittable_grims.split()
     n = len(grims)
-    matrix = np.zeros((n,n))
-
+    vector_matrix = [[None for _ in range(n)] for _ in range(n)]
+    
     for i in range(n):
         for j in range(i, n):
-            sim = cosine_similarity(grims[i], grims[j])
-            matrix[i][j] = matrix[j][i]  = sim
+            # Unisci i grimori e vettorializza il risultato
+            g = merge(grims[i], grims[j])
+            vectors = list(g.vectorize().values())
             
-    return matrix
+            if len(vectors) == 1:
+                vectors = [np.array([1]), np.array([1])]  # Evitiamo risultati vuoti
+            
+            # Salva i vettori per entrambi i grimori
+            vector_matrix[i][j] = vector_matrix[j][i] = vectors[:2]
+    
+    return vector_matrix
+
+def similarity_matrix(splittable_grims:Grimoire, methods:list[SimilarityMethod]) -> np.ndarray:
+    """
+    Calcola matrici di similarità utilizzando vettori precomputati per ciascun metodo fornito.
+
+    Args:
+        splittable_grims (Grimoire): Il grimorio da suddividere e analizzare.
+        methods (list[SimilarityMethod]): Lista dei metodi di similarità da utilizzare per il calcolo.
+
+    Returns:
+        list[np.ndarray]: Una lista di matrici di similarità (np.ndarray), dove ogni matrice
+                            corrisponde a un metodo di similarità.
+    """
+    vector_matrix = precompute_vectors(splittable_grims)
+    n = len(vector_matrix)
+    
+    # Crea una lista per contenere le matrici di similarità
+    matrices = []
+    
+    # Itera su ogni metodo di similarità
+    for method in methods:
+        matrix = np.zeros((n, n))  # Matrice di similarità per il metodo corrente
+        for i in range(n):
+            for j in range(i, n):
+                v1, v2 = vector_matrix[i][j]
+                # Calcola la similarità tra i vettori precomputati usando il metodo corrente
+                sim = method.calculate(v1, v2)
+                matrix[i][j] = matrix[j][i] = sim
+        # Aggiungi la matrice calcolata alla lista
+        matrices.append(matrix)
+    
+    return matrices
