@@ -3,6 +3,7 @@ from src.card import Card
 from src.decks import Deck
 import csv
     
+from src.similarity import SimilarityMethod
 import numpy as np
 from src.pooling import Pooling
 filename_translator = {ord(i):None for i in '".?/:;><'}
@@ -215,10 +216,10 @@ class Grimoire():
         return vector
 
 
-    def similarity_matrix(self) -> np.ndarray:
+    def similarity_matrix(self, methods:list[SimilarityMethod]) -> np.ndarray:
         if len(self.split()) == 1:
             raise ValueError
-        return similarity_matrix(self)
+        return similarity_matrix(self,methods)
 
 
     def split(self) -> dict:
@@ -592,8 +593,6 @@ def wait_valid_response(arg):
 
 
 
-
-from src.similarity import SimilarityMethod
 def precompute_vectors(splittable_grims:Grimoire) -> np.ndarray:
     """
     Precalcola i vettori risultanti dal merge di ogni coppia di grimori.
@@ -612,45 +611,56 @@ def precompute_vectors(splittable_grims:Grimoire) -> np.ndarray:
     for i in range(n):
         for j in range(i, n):
             # Unisci i grimori e vettorializza il risultato
+            if i==j:
+                vector_matrix[i][j] = [np.array([1]), np.array([1])]
+                continue
             g = merge(grims[i], grims[j])
             vectors = list(g.vectorize().values())
             
-            if len(vectors) == 1:
-                vectors = [np.array([1]), np.array([1])]  # Evitiamo risultati vuoti
+            # if len(vectors) == 1:
+            #     vectors = [np.array([1]), np.array([1])]  # Evitiamo risultati vuoti
             
             # Salva i vettori per entrambi i grimori
             vector_matrix[i][j] = vector_matrix[j][i] = vectors[:2]
     
     return vector_matrix
 
-def similarity_matrix(splittable_grims:Grimoire, methods:list[SimilarityMethod]) -> np.ndarray:
+
+
+def similarity_matrix(vector_matrix:np.ndarray, methods:list[SimilarityMethod]) -> np.ndarray:
     """
     Calcola matrici di similarità utilizzando vettori precomputati per ciascun metodo fornito.
+
+    Questa funzione prima precomputata i vettori per i grimori forniti e poi calcola le matrici di similarità
+    per ogni metodo specificato. Ogni matrice di similarità è costruita confrontando i vettori di ciascuna coppia 
+    di grimori utilizzando il metodo di similarità specificato.
 
     Args:
         splittable_grims (Grimoire): Il grimorio da suddividere e analizzare.
         methods (list[SimilarityMethod]): Lista dei metodi di similarità da utilizzare per il calcolo.
 
     Returns:
-        list[np.ndarray]: Una lista di matrici di similarità (np.ndarray), dove ogni matrice
-                            corrisponde a un metodo di similarità.
+        tuple[list[np.ndarray], list[float]]: Una tupla contenente due elementi:
+            - Una lista di matrici di similarità (np.ndarray), dove ogni matrice
+                corrisponde a un metodo di similarità.
+            - Una lista di tempi di esecuzione per ciascun metodo di similarità,
+                espressi in secondi.
     """
-    vector_matrix = precompute_vectors(splittable_grims)
     n = len(vector_matrix)
-    
-    # Crea una lista per contenere le matrici di similarità
     matrices = []
+    times = []
     
     # Itera su ogni metodo di similarità
     for method in methods:
-        matrix = np.zeros((n, n))  # Matrice di similarità per il metodo corrente
+        matrix = np.zeros((n, n)) 
+        start_time = time.time()
         for i in range(n):
             for j in range(i, n):
                 v1, v2 = vector_matrix[i][j]
-                # Calcola la similarità tra i vettori precomputati usando il metodo corrente
-                sim = method.calculate(v1, v2)
+                sim = method(v1, v2)
                 matrix[i][j] = matrix[j][i] = sim
+        times.append(time.time() - start_time)
         # Aggiungi la matrice calcolata alla lista
         matrices.append(matrix)
     
-    return matrices
+    return matrices, times
