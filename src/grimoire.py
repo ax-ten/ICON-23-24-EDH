@@ -2,7 +2,7 @@ import os, pickle
 from src.card import Card
 from src.decks import Deck
 import csv
-    
+
 from src.similarity import SimilarityMethod
 import numpy as np
 from src.pooling import Pooling
