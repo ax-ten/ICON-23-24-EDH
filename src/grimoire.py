@@ -629,15 +629,18 @@ def precompute_vectors(splittable_grims:Grimoire) -> np.ndarray:
 
 def similarity_matrix(vector_matrix:np.ndarray, methods:list[SimilarityMethod]) -> np.ndarray:
     """
-    Calcola matrici di similarità utilizzando vettori precomputati per ciascun metodo fornito.
+    Calcola matrici di similarità utilizzando vettori precomputati
+    per ciascun metodo fornito.
 
-    Questa funzione prima precomputata i vettori per i grimori forniti e poi calcola le matrici di similarità
-    per ogni metodo specificato. Ogni matrice di similarità è costruita confrontando i vettori di ciascuna coppia 
-    di grimori utilizzando il metodo di similarità specificato.
+    Questa funzione prima precomputata i vettori per i grimori forniti e poi calcola
+    le matrici di similarità per ogni metodo specificato. Ogni matrice di similarità 
+    è costruita confrontando i vettori di ciascuna coppia di grimori utilizzando il 
+    metodo di similarità specificato.
 
     Args:
         splittable_grims (Grimoire): Il grimorio da suddividere e analizzare.
-        methods (list[SimilarityMethod]): Lista dei metodi di similarità da utilizzare per il calcolo.
+        methods (list[SimilarityMethod]): Lista dei metodi di similarità da
+        utilizzare per il calcolo.
 
     Returns:
         tuple[list[np.ndarray], list[float]]: Una tupla contenente due elementi:

@@ -127,7 +127,7 @@ class Card():
     keywords : list[str]                        # []
     mana_production : dict[str:int|bool|str]    # {W:0, U:0, R:0, B:0, G:0, C:0, Or:True, Cost:""}
     default_category : list[str]                # []
-    legalities : dict[str:bool]
+    legalities : dict[str:bool]                 # ['commander': True, 'oathbreaker':True ...]
 
 
 
@@ -435,8 +435,8 @@ class Card():
         dict: A dictionary containing the flattened attributes of the Card. The dictionary includes:
             - 'mana_cost': The mana cost of the Card.
             - 'rarity': The rarity of the Card.
-            - 'toughness': (if Filters.isCreature is in positive_filters) The toughness of the Creature.
-            - 'power': (if Filters.isCreature is in positive_filters) The power of the Creature.
+            - 'toughness': (if Filters.isCreature in positive_filters) The toughness of the Creature.
+            - 'power': (if Filters.isCreature in positive_filters) The power of the Creature.
             - Any additional fields specified in the `additional_data` argument, with their corresponding values calculated using the provided functions.
 
     Example:
@@ -447,13 +447,8 @@ class Card():
         'mana_value_G': 1,
         'mana_value_C': 2}
     """
-        for filter in positive_filters:
-            if not filter(self): # questo sarebbe il filtro
-                return {}
-            
-        for filter in negative_filters:
-            if filter(self): # questo sarebbe il filtro
-                return {}
+        if not all(f(self) for f in positive_filters) or any(f(self) for f in negative_filters):
+            return {}
             
         flat = {
             "mana_cost": self.mana_cost,
@@ -466,12 +461,15 @@ class Card():
         
         if Filters.isCreature in positive_filters:
             flat = { **flat,
-                **{"toughness": [self.toughness]},
-                **{"power": [self.power]}
+                **{"toughness": self.toughness},
+                **{"power": self.power}
                 }
         if additional_data:
             for key, func in additional_data.items():
                 flat[key] = func(self)
+
+        flat = {key: [value] for key, value in flat.items()}
+
         
         return flat
     
