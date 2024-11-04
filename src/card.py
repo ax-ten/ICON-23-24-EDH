@@ -130,32 +130,107 @@ class Card():
     legalities : dict[str:bool]                 # ['commander': True, 'oathbreaker':True ...]
 
 
-
     def __repr__(self) -> str:     return f"{self.name}"
-    def __eq__(self,other):        return self.oracle_id == other.oracle_id
+    def __eq__(self,other):        return self.name == other.name
     def __hash__(self):        return hash(self.oracle_id)
-    def __init__(self) -> None: pass
+    def __init__(self, name=None) -> None: 
+        if name is not None:
+            self.search(name=name)
 
 
-    def load(self, source:dict|csv.DictReader):
+    #MOLTO WIP, non usare #To-Do
+    def _production(text:str|dict)->dict: 
+        """['G']
+        Extracts and interprets the mana production information from the card's text.
+
+        This method parses the card's text to identify mana production capabilities, extracting both the mana
+        symbols produced and any additional notes such as conditions (e.g., "for each" clause) or variable amounts
+        of mana (e.g., "Add X mana of any color").
+
+        Returns:
+            dict: A dictionary representing the mana production, with the following structure:
+                - **W, U, R, B, G, C**: Count of each respective mana symbol produced.
+                - **Or**: A boolean flag indicating whether the mana production is flexible
+                - **Note**: Any additional notes or conditions (e.g., "for each creature").
+                - **cost**: The activation cost.
+
+        Mana Parsing Logic:
+            - Searches the card's text for "Add" followed by mana symbols enclosed in `{}`.
+            - Handles cases where mana is produced "for each" of a particular quality (e.g., creature or land).
+            - Identifies generic mana production (e.g., "Add X mana of any color") and maps words like "one", "two", "three", etc. to their numeric equivalents.
+            - Extracts the activation cost, if present, which appears before a colon `:` in the card's text.
+
+        Example:
+            mana_dict = card_instance.get_mana_production()
+
+        Notes:
+            - If the card does not contain mana production information, the method returns `None`.
+            - The method accounts for variable mana amounts (X) and specific conditions tied to mana production.
+        """
+
+
+        mana_dict = {"W": 0, "U": 0, "R": 0, "B": 0, "G": 0, "C":0, "Or": True, "Note": "", "cost":''}
+
+        if isinstance(text, dict):
+            mana_dict.update(text)
+            return mana_dict
+
+        match = re.search(r'\.?\s*(.*?)\s*Add\s+(.*)\.', text)
+        if not match:
+            return None 
+        
+        #suppongo ci sia un costo di attivazione
+        try:
+            cost, mana_produced = text.split(':',1)
+        except Exception as e:
+            cost, mana_produced = text.split('.',1)
+        mana_dict['cost']=cost
+
+        # trova i simboli tra {}
+        mana_symbols = re.findall(r'\{([WUBRGC])\}', mana_produced)
+
+        if mana_symbols:
+            # Add {*} for each [...]
+            if "for each" in mana_produced:
+                quality_match = re.search(r'for each (\w+)', mana_produced)
+                if quality_match:
+                    x = quality_match.group(1)
+                    for symbol in mana_symbols:
+                        mana_dict[symbol] = "X"
+                    mana_dict["Note"] = f"for each {x}"
+            else:
+                for symbol in mana_symbols:
+                    mana_dict[symbol] += 1
+                    mana_dict["Or"] = False
+
+        # Add X mana of any color
+        QUANTITY = {"one":1, "two":2, "three":3, "four":4, "five":5, "X":"X"}
+        quantity_match = re.search(r'Add (\w+) mana of any color', mana_produced)
+        if quantity_match:
+            x = quantity_match.group(1)
+            for symbol in "WURBG":
+                mana_dict[symbol] = QUANTITY[x]
+        return  mana_dict
+
+    def load(self, source:list|csv.DictReader):
         """
         Loads data from a given source into the current object, mapping values based on a predefined key-to-attribute mapping.
 
-        This method takes a source of type `dict` or `csv.DictReader`, and uses the `LOAD_MAPPING` attribute of the class
+        This method takes a source of type `list` or `csv.DictReader`, and uses the `LOAD_MAPPING` attribute of the class
         to assign values to the corresponding object attributes.
 
         Args:
-            source (dict or csv.DictReader): 
+            source (list or csv.DictReader): 
                 The data source containing attribute values to load. 
-                - If `source` is a `dict`, it is expected to contain key-value pairs corresponding to object attributes.
+                - If `source` is a `list`, it is expected to contain key-value pairs corresponding to object attributes.
                 - If `source` is a `csv.DictReader`, the values are extracted from the appropriate column in the CSV.
 
         Raises:
-            ValueError: If `source` is not of type `dict` or `csv.DictReader`.
+            ValueError: If `source` is not of type `list` or `csv.DictReader`.
 
         Mapping Logic:
             - The method iterates over `self.LOAD_MAPPING`, where each entry is a tuple containing:
-                - `keys`: A tuple of possible keys for `dict` and `csv.DictReader` sources.
+                - `keys`: A tuple of possible keys for `list` and `csv.DictReader` sources.
                 - `transform`: A transformation function applied to the value if not `None`.
             - For each attribute, the corresponding value is extracted from the `source` using the appropriate key based on the source type.
             - If a `transform` function is provided, the value is transformed before being assigned to the attribute.
@@ -167,21 +242,22 @@ class Card():
             card_instance.load({'name': 'Black Lotus', 'mana_cost': '0'})
 
         """
-        if    isinstance(source, dict):           k = 1
-        elif  isinstance(source, csv.DictReader): k = 0
-        else: raise ValueError("source deve essere di tipo dict o csv.DictReader")
+        if    isinstance(source, list):           k = 0
+        elif  isinstance(source, dict): k = 1
+        else: raise ValueError("source deve essere di tipo list o csv.DictReader")
 
         for attribute,  (keys, transform) in self.LOAD_MAPPING.items():
-            value = source[keys[k]] if keys[k] in source else source['oracleCard'][keys[k]]
+            if keys[k] is None:
+                continue
+            value = source[keys[k]] if k == 0 or keys[k] in source else source['oracleCard'][keys[k]]
+
             if transform:
                 value = transform(value)
             setattr(self, attribute, value)
-
-
         return self
 
 
-    def search(self, oracle_id:str=None, name:str=None):
+    def search(self, oracle_id:str=None, name:str=None) -> 'Card':
         """
         Searches for a card in the oracle_cards CSV file by `oracle_id` or `name`.
         If a match is found, it loads the card details using `self.load_csv`.
@@ -201,7 +277,7 @@ class Card():
             instance.search(oracle_id="abc123")
             instance.search(name="Black Lotus")
         """
-        if oracle_id == None and name == None:
+        if oracle_id is None and name is None:
             raise ValueError("Specifica almeno uno tra oracle_id o name")
         CSV_PATH = "./data/oracle_cards/oracle_cards.csv"
         if not exists(CSV_PATH):
@@ -213,9 +289,8 @@ class Card():
 
             for row in reader:
                 if (oracle_id is not None and row[0] == oracle_id) or (name is not None and row[1] == name):
-                    print(row)
                     self.load(row)
-                    break
+                    return self
         raise ValueError(f"Non è stata trovata alcuna carta per {(oracle_id or name)}")
         
 
@@ -355,50 +430,8 @@ class Card():
         'mana_production': lambda o, v: [o.line('mana_production', [key, value]) for key, value in v.items() if (value.isdigit() and int(value) > 0) or key == "Or"]
     }
 
-    # def to_facts(self) -> str:
-    #     facts = []
-    #     facts.append(self.line('card'))
-    #     facts.append(self.line('cost', [self.mana_cost]))
-    #     for color, value in self.mana_value.items():
-    #         if value > 0:
-    #             facts.append(self.line('mana_value', [color,value]))
-        
-    #     for color, has_color in self.color_identity.items():
-    #         if has_color:
-    #             facts.append(self.line('color_identity', [color,value]))
 
-    #     for color, is_color in self.colors.items():
-    #         if is_color:
-    #             facts.append(self.line('color', [color,value]))
 
-    #     facts.append(self.line('rarity', [self.rarity]))
-    #     if self.power.isdigit() :
-    #         facts.append(self.line('power', [self.power]))
-    #         facts.append(self.line('toughness', [self.toughness]))
-
-    #     if len(self.text)>0:
-    #         facts.append(self.line('text', [self.text]))
-
-    #     for t in self.types:
-    #         facts.append(self.line('type', [t]))
-
-    #     for sup in self.super_types:
-    #         facts.append(self.line('super_type', [sup]))
-        
-    #     for sub in self.sub_types:
-    #         facts.append(self.line('sub_type', [sub]))
-
-    #     for kw in self.keywords:
-    #         if len(kw)>0:
-    #             facts.append(self.line('keyword', [kw]))
-
-    #     for key, value in self.mana_production.items():
-    #         if self.mana_production['Cost'] == "":
-    #             break
-    #         elif (value.isdigit() and value>0) or key == "Or":
-    #             facts.append(self.line('mana_production',[key,value]))
-
-    #     return facts
     def to_facts(self) -> str:
         facts = []
         for key, transform in self.fact_mapping.items():
@@ -409,139 +442,84 @@ class Card():
                     facts.extend(result)
                 elif result:
                     facts.append(result)
-
         return facts
+
 
     def to_dict(self):
         return {attr: getattr(self, attr) for attr in self.LOAD_MAPPING}
-    
+
+
+    def filter( self, 
+                positive_filters: list[Callable[['Card'], bool]] = [],
+                negative_filters: list[Callable[['Card'], bool]] = []) -> bool:
+        """
+        Determines if the Card satisfies the provided positive and negative filters.
+
+        Args:
+            positive_filters (list[Callable[['Card'], bool]], optional): A list of functions that return True 
+                if the Card satisfies the filter condition. The Card must pass all positive filters to return True.
+            negative_filters (list[Callable[['Card'], bool]], optional): A list of functions that return False 
+                if the Card satisfies the filter condition. The Card must not pass any negative filters to return True.
+
+        Returns:
+            bool: True if the Card satisfies all positive filters and none of the negative filters, False otherwise.
+        """
+        
+        return all(f(self) for f in positive_filters) and not any(f(self) for f in negative_filters)
+
+
     def flatten(self, 
-                positive_filters: list[Filters] = None,
-                negative_filters: list[Filters] = None,
-                additional_data: dict[str, Callable['Card', int]] = None # type: ignore
-            ) -> dict:
-        """Flatten the attributes of the Card object based on provided filters and additional data.
+                additional_data: dict[str, Callable[['Card'], int]] = None) -> dict:
+        """
+        Flattens the attributes of the Card object, adding additional data if provided.
 
-    Args:
-        positive_filters (list[Filters], optional): A list of filter functions that must all return True for 
-            the Card to be included in the flattened output.
-        negative_filters (list[Filters], optional): A list of filter functions that must all return False for 
-            the Card to be included in the flattened output. 
-        additional_data (dict[str, Callable['Card', int]], optional): A dictionary of additional data to 
-            include in the flattened output. The keys are the names of the fields, and the values are functions 
-            that take a Card instance as input and return an integer.
+        Args:
+            additional_data (dict[str, Callable[['Card'], int]], optional): A dictionary of additional data 
+                to include in the flattened output. The keys are the names of the fields, and the values are functions 
+                that take a Card instance as input and return an integer.
 
-    Returns:
-        dict: A dictionary containing the flattened attributes of the Card. The dictionary includes:
-            - 'mana_cost': The mana cost of the Card.
-            - 'rarity': The rarity of the Card.
-            - 'toughness': (if Filters.isCreature in positive_filters) The toughness of the Creature.
-            - 'power': (if Filters.isCreature in positive_filters) The power of the Creature.
-            - Any additional fields specified in the `additional_data` argument, with their corresponding values calculated using the provided functions.
+        Returns:
+            dict: A dictionary containing the flattened attributes of the Card. The dictionary includes:
+                - 'mana_cost': The mana cost of the Card.
+                - 'rarity': The rarity of the Card.
+                - 'toughness' and 'power' if the Card is a Creature (checked internally).
+                - Any additional fields specified in `additional_data`, with their corresponding values calculated 
+                    using the provided functions.
 
-    Example:
-        >>> card = Card().load('Kodama of the West Tree)  # Assume Card is properly defined
-        >>> card.flatten(additional_data={f"mana_value_{k}": [v] for k, v in self.mana_value.items()})
-        {'mana_cost': [3], 
-        'rarity': ['mythic'], 
-        'mana_value_G': 1,
-        'mana_value_C': 2}
-    """
-        if not all(f(self) for f in positive_filters) or any(f(self) for f in negative_filters):
-            return {}
-            
+        Example:
+            >>> card = Card().load('Kodama of the West Tree')  # Assume Card is properly defined
+            >>> card.flatten(additional_data={"mana_value_G": lambda c: c.mana_value.get('G', 0)})
+            {'mana_cost': [3], 
+            'rarity': ['mythic'], 
+            'mana_value_G': 1}
+        """
+        # Base flattened data for each card
         flat = {
             "mana_cost": self.mana_cost,
             "rarity": rarity_mapping[self.rarity],
+            # Add mana_value and color_identity mappings if needed
             # **{f"mana_value_{k}": v for k, v in self.mana_value.items()},
-            # **{f"color_identity_{k}": int(v)]for k, v in self.color_identity.items()},
-            # **{f"color_identity_none": int(all(v is False for v in self.color_identity.values()))},
+            # **{f"color_identity_{k}": int(v) for k, v in self.color_identity.items()},
             # **{f"colors_{k}": int(v) for k, v in self.colors.items()},
         }
-        
-        if Filters.isCreature in positive_filters:
-            flat = { **flat,
-                **{"toughness": self.toughness},
-                **{"power": self.power}
-                }
+
+        # Include creature-specific attributes if the Card is a Creature
+        if self.filter(positive_filters=[Filters.isCreature]):
+            flat.update({"toughness": self.toughness, "power": self.power})
+
+        # Add any additional specified fields from additional_data
         if additional_data:
             for key, func in additional_data.items():
                 flat[key] = func(self)
 
         flat = {key: [value] for key, value in flat.items()}
 
-        
         return flat
-    
-    #MOLTO WIP, non usare #To-Do
-    def get_mana_production(self)->dict: 
-        """
-        Extracts and interprets the mana production information from the card's text.
 
-        This method parses the card's text to identify mana production capabilities, extracting both the mana
-        symbols produced and any additional notes such as conditions (e.g., "for each" clause) or variable amounts
-        of mana (e.g., "Add X mana of any color").
 
-        Returns:
-            dict: A dictionary representing the mana production, with the following structure:
-                - **W, U, R, B, G, C**: Count of each respective mana symbol produced.
-                - **Or**: A boolean flag indicating whether the mana production is flexible
-                - **Note**: Any additional notes or conditions (e.g., "for each creature").
-                - **cost**: The activation cost.
-
-        Mana Parsing Logic:
-            - Searches the card's text for "Add" followed by mana symbols enclosed in `{}`.
-            - Handles cases where mana is produced "for each" of a particular quality (e.g., creature or land).
-            - Identifies generic mana production (e.g., "Add X mana of any color") and maps words like "one", "two", "three", etc. to their numeric equivalents.
-            - Extracts the activation cost, if present, which appears before a colon `:` in the card's text.
-
-        Example:
-            mana_dict = card_instance.get_mana_production()
-
-        Notes:
-            - If the card does not contain mana production information, the method returns `None`.
-            - The method accounts for variable mana amounts (X) and specific conditions tied to mana production.
-        """
-        match = re.search(r'\.?\s*(.*?)\s*Add\s+(.*)\.', self.text)
-        if not match:
-            return None
-        
-        #suppongo ci sia un costo di attivazione
-        try:
-            cost, mana_produced = self.text.split(':',1)
-        except Exception as e:
-            cost, mana_produced = self.text.split('.',1)
-        mana_dict = {"W": 0, "U": 0, "R": 0, "B": 0, "G": 0, "C":0, "Or": True, "Note": "", "cost":cost}
-
-        # trova i simboli tra {}
-        mana_symbols = re.findall(r'\{([WUBRGC])\}', mana_produced)
-
-        if mana_symbols:
-            # Add {*} for each [...]
-            if "for each" in mana_produced:
-                quality_match = re.search(r'for each (\w+)', mana_produced)
-                if quality_match:
-                    x = quality_match.group(1)
-                    for symbol in mana_symbols:
-                        mana_dict[symbol] = "X"
-                    mana_dict["Note"] = f"for each {x}"
-            else:
-                for symbol in mana_symbols:
-                    mana_dict[symbol] += 1
-                    mana_dict["Or"] = False
-
-        # Add X mana of any color
-        QUANTITY = {"one":1, "two":2, "three":3, "four":4, "five":5, "X":"X"}
-        quantity_match = re.search(r'Add (\w+) mana of any color', mana_produced)
-        if quantity_match:
-            x = quantity_match.group(1)
-            for symbol in "WURBG":
-                mana_dict[symbol] = QUANTITY[x]
-        return  mana_dict
-    
     def abs_mana_production(self) ->int:
         HIGH = 10
-        prod = self.get_mana_production()
+        prod = _production(self.text) # type: ignore
         if prod is None: return 0
         if 'for each' in prod['Note']: return HIGH
         if prod['Or']:
@@ -613,7 +591,7 @@ class Card():
     @staticmethod
     def _colors(ci:list) -> dict:
         translator = {'W':'White','U':'Blue','B':'Black','R':'Red','G':'Green'}
-        return {k: k in ci for k,v in translator.items()}
+        return {k: k in ci or v in ci for k,v in translator.items()}
     
 
     # def _split_typeline(typeline:str) -> tuple: 
@@ -644,15 +622,16 @@ class Card():
         #         try:
         #             subtypes = typeline.split('—')[1].split(" ")[1:]
         #         except:
-        #             subtypes = []
+        #             subtypes = []get_mana_production
         # return subtypes
 
     @staticmethod
-    def _legalities(line:str|list)->dict:
+    def _legalities(line:str|dict)->dict:
         if isinstance(line, dict):
             return line
         import json
-        return json.loads(line[11].replace( "'",'"').lower())
+        line = line.replace("'", '"').replace("True", "true").replace("False", "false")
+        return json.loads(line)        
         
     LOAD_MAPPING = {
         'oracle_id':    ([0, 'id'],         None),
@@ -668,10 +647,10 @@ class Card():
         'mana_value':   ([4, 'manaCost'],   _mana_value),
         'colors':       ([8, 'colors'],     _colors),
         'color_identity':([9,'colorIdentity'], _colors),
-        'mana_cost':    ([5, 'cmc'],        int),  
+        'mana_cost':    ([5, 'cmc'],        float),  
         # 'set':          ([12, 'set'],       None),  
-        'legalities':   ([None,'legalities'], _legalities),  
-        'mana_production': ([None, 'manaProduction'], None),  
+        'legalities':   ([11,'legalities'], _legalities),  
+        'mana_production': ([7, 'manaProduction'], _production),  
         'default_category': ([None, 'defaultCategory'], None),
     }
 

@@ -4,7 +4,7 @@ from src.by import By
 from src.card import Card
 from simple_term_menu import TerminalMenu
 
-def advice_cards():
+def suggest_cards():
     options = [
         "[1] Cerca il commander per nome (potrebbero volerci alcuni minuti)", 
         "[2] Seleziona file già scaricati"
@@ -52,7 +52,7 @@ def list_files(directory="./data/fetched", pattern=""):
     return [file for file in os.listdir(directory) if os.path.isfile(os.path.join(directory, file)) and file.endswith("_grimoire.pickle")]
 
 
-def advice_commander():
+def suggest_deck():
     #in base al mio profilo
     #in base ad un tema particolare
     # Aggiungi altri siti di deckbuilding oltre archidekt
@@ -120,7 +120,7 @@ def main():
     while True:
         options = [
             "[1] Consigliami delle carte per il mio commander", 
-            "[2] Consigliami dei Commander", 
+            "[2] Consigliami delle carte per il mio mazzo", 
             "[3] Info sull'ontologia",
             "[4] Info sulla Knowledge Base",
             "[q] Termina esecuzione"
@@ -131,9 +131,9 @@ def main():
         
         match(menu_entry_index):
             case 0:
-                advice_cards()
+                suggest_cards()
             case 1:
-                advice_commander()
+                suggest_deck()
             case 2:
                 info_onto()
             case 3:

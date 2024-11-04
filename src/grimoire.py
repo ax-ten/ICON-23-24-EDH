@@ -52,7 +52,7 @@ class Grimoire():
     
             with open(CSV_PATH, 'r',encoding="UTF-8", errors="ignore") as infile:
                 reader = csv.reader(infile,delimiter=',')
-                head = next(reader)
+                # head = next(reader)
                 for row in reader:
                     card = Card().load(row)
                     self.append(card)
@@ -153,6 +153,17 @@ class Grimoire():
 
 
     from typing import Callable
+    def filter(self,
+            positive_filters: list[Callable[[Card], bool]] = [], 
+            negative_filters: list[Callable[[Card], bool]] = [], ) -> 'Grimoire':
+        g = Grimoire()
+        for card, deckids in self.items():
+            if card.filter(positive_filters, negative_filters):
+                g.append(card, deckids)
+        return g
+    
+
+
     def dataframe(self, 
                 positive_filters: list[Callable[[Card], bool]] = None, 
                 negative_filters: list[Callable[[Card], bool]] = None, 
@@ -185,9 +196,10 @@ class Grimoire():
         flattened_cards = [card.flatten(positive_filters, negative_filters, additional_data) for card in self]
         df = pd.concat([pd.DataFrame(card) for card in flattened_cards], ignore_index=True)
         return df
+    
 
 
-    def vectorize(self) -> dict[str, list[bool]]:
+    def vectorize(self) -> tuple[dict[str: list[1|0]], list[str]]:
         """
         Creates a binary vector representation for each deck based on the cards it contains.
 
@@ -203,16 +215,25 @@ class Grimoire():
         Example:
             vector_representation = grimoire.vectorize()
         """
-        vector: dict[str, list[bool]] = {}
+        vector: dict[str, list[1|0]] = {}
+        card_names = list(self.keys())
 
-        deck_ids = [deck_id for deck_list in self.values() for deck_id in deck_list]
+        deck_ids = set([deck_id for deck_list in self.values() for deck_id in deck_list])
         for deck_id in deck_ids:
             vector[deck_id] = [0] * len(self)
 
-        for i, card in enumerate(self):
+        for i, card in enumerate(card_names):
             for deck_id in self[card]:
                 vector[deck_id][i] = 1
         
+        return vector, card_names
+    
+
+    def partial_vector(self, selection:list[Card]) -> list[1|0]:
+        vector = [0]*len(self)
+        for i, card in enumerate(self):
+            if card in selection:
+                vector[i] = 1
         return vector
 
 
@@ -552,7 +573,8 @@ def fetch_cards(decks_to_fetch:list):
                 continue
             seen.add(deck.id)
             response = wait_valid_response(cards_url(deck.id))
-            
+            if response is None:
+                continue
             queue.put((response, deck.id))
             time.sleep(0.2) # per non sovraccaricare la API
     except Exception as e:
@@ -582,18 +604,23 @@ def wait_valid_response(arg):
                     encountered during the requests.
     """
     global errori
+    local_error = 0
     response = requests.get(arg)
-    while response.status_code != 200:
-        errori += 1
+    while response.status_code != 200 and local_error<4:
         if response.status_code == 429:
             time.sleep(4) # per non sovraccaricare la API
         response = requests.get(arg)
         time.sleep(0.4) # per non sovraccaricare la API
+        errori += 1
+        local_error +=1
+    if local_error == 4:
+        return None
+        raise TimeoutError(f"{response.status_code}. Timeout nel recupero di {arg}")
     return response
 
 
 
-def precompute_vectors(splittable_grims:Grimoire) -> np.ndarray:
+def partial_vectors_matrix(splittable_grims:Grimoire) -> np.ndarray:
     """
     Precalcola i vettori risultanti dal merge di ogni coppia di grimori.
 
@@ -617,17 +644,13 @@ def precompute_vectors(splittable_grims:Grimoire) -> np.ndarray:
             g = merge(grims[i], grims[j])
             vectors = list(g.vectorize().values())
             
-            # if len(vectors) == 1:
-            #     vectors = [np.array([1]), np.array([1])]  # Evitiamo risultati vuoti
-            
-            # Salva i vettori per entrambi i grimori
             vector_matrix[i][j] = vector_matrix[j][i] = vectors[:2]
     
     return vector_matrix
 
 
 
-def similarity_matrix(vector_matrix:np.ndarray, methods:list[SimilarityMethod]) -> np.ndarray:
+def similarity_pairwise_matrix(vector_matrix:np.ndarray, methods:list[SimilarityMethod]) -> np.ndarray:
     """
     Calcola matrici di similarità utilizzando vettori precomputati
     per ciascun metodo fornito.
@@ -649,6 +672,27 @@ def similarity_matrix(vector_matrix:np.ndarray, methods:list[SimilarityMethod]) 
             - Una lista di tempi di esecuzione per ciascun metodo di similarità,
                 espressi in secondi.
     """
+    n = len(vector_matrix)
+    matrices = []
+    times = []
+    
+    # Itera su ogni metodo di similarità
+    for method in methods:
+        matrix = np.zeros((n, n)) 
+        start_time = time.time()
+        for i in range(n):
+            for j in range(i, n):
+                v1, v2 = vector_matrix[i][j]
+                sim = method(v1, v2)
+                matrix[i][j] = matrix[j][i] = sim
+        times.append(time.time() - start_time)
+        # Aggiungi la matrice calcolata alla lista
+        matrices.append(matrix)
+    
+    return matrices, times
+
+def similarity_matrix(grimoire:Grimoire, methods:list[SimilarityMethod]) -> np.ndarray:
+    deck_ids, vectors = grimoire.vectorize().items()
     n = len(vector_matrix)
     matrices = []
     times = []
